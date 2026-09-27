@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin Lumina Medika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --plum:#722975; --magenta:#EC268F; --royal:#082DF7; --ocean:#0B7CC2; --amber:#FFCC29; --lemon:#FFF212;
+  --bg:#F7F3F8; --surface:#FFFFFF; --surface-2:#F1EAF3; --line:#E6DCEA; --line-strong:#CDBFD3;
+  --ink:#1F1330; --muted:#5E5169; --brand:#722975; --on-brand:#FFFFFF; --accent-text:#C21A74;
+  --link:#082DF7; --info:#0A6AA6; --info-decor:#0B7CC2; --warn-bg:#FFCC29; --warn-ink:#1F1330;
+  --ok:#0F7B4B; --ok-bg:#E3F4EA; --danger:#B42318; --danger-bg:#FDECEA;
+  --side:#2A1233; --side-ink:#E9D6EA;
+  --font:"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"DM Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#120A1A; --surface:#1C1226; --surface-2:#251931; --line:#35263F; --line-strong:#4A3856;
+  --ink:#F3EDF6; --muted:#B9AEC2; --brand:#D59AD8; --on-brand:#1F1330; --accent-text:#FF6FB5;
+  --link:#8FA3FF; --info:#5CC1FF; --info-decor:#5CC1FF; --ok:#5FD39A; --ok-bg:#16301F; --danger:#FF8A80; --danger-bg:#3A1616;
+  --side:#0C0612; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#120A1A; --surface:#1C1226; --surface-2:#251931; --line:#35263F; --line-strong:#4A3856;
+  --ink:#F3EDF6; --muted:#B9AEC2; --brand:#D59AD8; --on-brand:#1F1330; --accent-text:#FF6FB5;
+  --link:#8FA3FF; --info:#5CC1FF; --info-decor:#5CC1FF; --ok:#5FD39A; --ok-bg:#16301F; --danger:#FF8A80; --danger-bg:#3A1616;
+  --side:#0C0612; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.55 var(--font)}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--info-decor);outline-offset:2px;border-radius:6px}
+h1,h2,h3{margin:0;line-height:1.2;text-wrap:balance}
+p{margin:0}
+.ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+aside.side{background:var(--side);color:var(--side-ink);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 18px;color:#fff;text-decoration:none}
+.brand svg{width:36px;height:36px}
+.brand b{display:block;font-size:15px}.brand small{display:block;font-size:11px;opacity:.75;letter-spacing:.08em;text-transform:uppercase}
+.nav-btn{all:unset;cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;font-weight:600;font-size:14.5px}
+.nav-btn:hover{background:rgba(255,255,255,.07)}
+.nav-btn[aria-current="page"]{background:#722975;color:#fff}
+.nav-btn:focus-visible{outline:3px solid var(--amber)}
+.nav-btn .count{margin-left:auto;font:500 12px/1 var(--mono);background:var(--amber);color:#1F1330;padding:4px 7px;border-radius:99px}
+.side .group{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.6;padding:16px 12px 6px}
+.side .foot{margin-top:auto;font-size:12.5px;opacity:.8;padding:12px;border-top:1px solid rgba(255,255,255,.12)}
+.side a.pub{color:var(--lemon)}
+main{min-width:0;padding:24px clamp(16px,3vw,36px) 48px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}
+.top h1{font-size:24px;font-weight:800}
+.top p{color:var(--muted);font-size:14px;margin-top:4px}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border-radius:10px;border:1.5px solid transparent;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;background:none}
+.btn-primary{background:var(--brand);color:var(--on-brand)}
+.btn-ghost{border-color:var(--line-strong);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+.btn-danger{background:var(--danger-bg);color:var(--danger)}
+.btn-sm{min-height:32px;padding:0 10px;font-size:13px;border-radius:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{padding:16px 18px}
+.kpi small{color:var(--muted);font-weight:600;font-size:12.5px}
+.kpi strong{display:block;font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:4px}
+.kpi span{font-size:12.5px;color:var(--muted)}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px;border-bottom:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:99px;border:1.5px solid var(--line-strong);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line-strong);border-radius:10px;padding:0 10px;min-height:36px;background:var(--bg)}
+.search input{border:0;background:none;outline:none;min-width:0;width:200px}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.title b{display:block;font-weight:700}
+td.title small{color:var(--muted);font-size:12.5px}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:13px}
+.actions{display:flex;gap:6px;justify-content:flex-end;white-space:nowrap}
+.tag{display:inline-flex;align-items:center;font:600 11px/1 var(--font);letter-spacing:.06em;text-transform:uppercase;padding:6px 8px;border-radius:6px;white-space:nowrap}
+.tag-berita{background:color-mix(in srgb,var(--info-decor) 16%,transparent);color:var(--info)}
+.tag-artikel{background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)}
+.tag-pengumuman{background:var(--warn-bg);color:var(--warn-ink)}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;white-space:nowrap}
+.st::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.st-terbit{color:var(--ok)}.st-draf{color:var(--muted)}.st-terjadwal{color:var(--info)}.st-menunggu{color:var(--accent-text)}
+.editor{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+@media (max-width:1100px){.editor{grid-template-columns:1fr}}
+.pane{padding:18px;display:grid;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700}
+.field .hint{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+input[type=text],input[type=date],select,textarea{min-height:42px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--line-strong);background:var(--bg);width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+textarea{resize:vertical}
+.title-input{font-size:20px;font-weight:700}
+.rte-bar{display:flex;flex-wrap:wrap;gap:4px;padding:6px;border:1.5px solid var(--line-strong);border-bottom:0;border-radius:10px 10px 0 0;background:var(--surface-2)}
+.rte-bar button{all:unset;cursor:pointer;min-width:32px;height:32px;display:grid;place-items:center;border-radius:6px;font-weight:700;font-size:13px;padding:0 6px}
+.rte-bar button:hover{background:var(--surface)}
+.rte-bar button:focus-visible{outline:2px solid var(--info-decor)}
+.rte{border-radius:0 0 10px 10px!important;min-height:220px;font-size:15px;line-height:1.65}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{all:unset;cursor:pointer;width:44px;height:30px;border-radius:8px;border:2px solid transparent}
+.sw[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface) inset}
+.sw:focus-visible{outline:3px solid var(--info-decor)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}
+.check input{width:18px;height:18px;accent-color:#722975;margin-top:2px}
+.serp{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--bg);font-family:Arial,sans-serif}
+.serp .u{font-size:12px;color:var(--muted)}
+.serp .t{font-size:17px;color:var(--link);margin:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.serp .d{font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sticky-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.note{font-size:12.5px;color:var(--muted);background:var(--surface-2);padding:10px 12px;border-radius:10px}
+.err{color:var(--danger);font-size:13px;font-weight:600}
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.mod{padding:16px;display:flex;flex-direction:column;gap:10px}
+.mod q{font-size:14.5px}
+.mod .meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 12px}
+.mod .consent{font-size:12.5px;display:flex;gap:6px;align-items:center}
+.alb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;padding:14px}
+.thumb{aspect-ratio:1;max-width:100%;border-radius:10px;overflow:hidden;position:relative;background:var(--surface-2)}
+.thumb img,.thumb svg{width:100%;height:100%;object-fit:cover;display:block}
+.thumb span{position:absolute;left:8px;bottom:8px;right:8px;font-size:12px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.drop{border:2px dashed var(--line-strong);border-radius:12px;display:grid;place-items:center;text-align:center;padding:16px;color:var(--muted);font-size:13px;cursor:pointer;aspect-ratio:1;max-width:100%}
+.drop:hover{border-color:var(--brand);color:var(--brand)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:14px;z-index:99}
+.inline-confirm{display:flex;gap:6px;align-items:center;justify-content:flex-end;font-size:13px;flex-wrap:wrap}
+.theme-btn{all:unset;cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;font-weight:600;font-size:13.5px}
+.theme-btn:hover{background:rgba(255,255,255,.07)}
+.mob-top{display:none}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  aside.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;gap:4px;padding:12px 16px}
+  .side .group,.side .foot{display:none}
+  .brand{width:100%;padding-bottom:8px}
+  .nav-btn{padding:8px 10px;font-size:13.5px}
+  .search{margin-left:0;width:100%}.search input{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" aria-label="Navigasi admin">
+    <a class="brand" href="index.html"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="2" y="2" width="44" height="44" rx="13" fill="#722975"/><path d="M19 11h10v8h8v10h-8v8H19v-8h-8V19h8z" fill="#EC268F"/><path d="M19 19h10v10H19z" fill="#fff"/><circle cx="36.5" cy="11.5" r="4.5" fill="#FFF212"/></svg><span><b>Lumina Medika</b><small>Panel Admin</small></span></a>
+    <button class="nav-btn" data-view="dash" aria-current="page"><i data-ic="grid"></i>Dasbor</button>
+    <div class="group">Konten</div>
+    <button class="nav-btn" data-view="posts"><i data-ic="news"></i>Kabar Klinik</button>
+    <button class="nav-btn" data-view="testi"><i data-ic="chat"></i>Testimoni<span class="count" id="modCount">3</span></button>
+    <button class="nav-btn" data-view="gallery"><i data-ic="image"></i>Galeri Foto</button>
+    <button class="nav-btn" data-view="partners"><i data-ic="hand"></i>Mitra</button>
+    <div class="group">Klinik</div>
+    <button class="nav-btn" data-view="doctors"><i data-ic="stetho"></i>Dokter & Jadwal</button>
+    <button class="theme-btn" id="themeBtn"><span id="themeIcon"></span><span id="themeLbl">Tema: Sistem</span></button>
+    <div class="foot">Masuk sebagai <b>Nadia (Editor)</b><br>Peran: Admin · Editor · Peninjau Medis<br><a class="pub" href="index.html">Lihat situs publik →</a></div>
+  </aside>
+
+  <main id="main">
+    <!-- DASBOR -->
+    <section data-v="dash">
+      <div class="top"><div><h1>Dasbor</h1><p>Ringkasan konten dan tugas yang menunggu. Data contoh prototipe.</p></div><button class="btn btn-primary" data-go="new"><i data-ic="plus"></i>Tulis konten baru</button></div>
+      <div class="kpis">
+        <div class="card kpi"><small>Konten terbit</small><strong id="kPub">0</strong><span>berita, artikel, pengumuman</span></div>
+        <div class="card kpi"><small>Draf & terjadwal</small><strong id="kDraft">0</strong><span>belum tampil di situs</span></div>
+        <div class="card kpi"><small>Testimoni menunggu</small><strong id="kMod">0</strong><span>perlu moderasi</span></div>
+        <div class="card kpi"><small>Pengumuman aktif</small><strong id="kPin">0</strong><span>tampil di bilah atas</span></div>
+      </div>
+      <div class="card"><div class="toolbar"><b>Aktivitas terbaru</b></div><div class="tbl-wrap"><table><tbody id="activity"></tbody></table></div></div>
+    </section>
+
+    <!-- DAFTAR POST -->
+    <section data-v="posts" hidden>
+      <div class="top"><div><h1>Kabar Klinik</h1><p>Berita, artikel kesehatan, dan pengumuman yang tampil di situs.</p></div><button class="btn btn-primary" data-go="new"><i data-ic="plus"></i>Tulis konten baru</button></div>
+      <div class="card">
+        <div class="toolbar" id="postFilter">
+          <button class="chip" data-f="semua" aria-pressed="true">Semua</button><button class="chip" data-f="berita" aria-pressed="false">Berita</button><button class="chip" data-f="artikel" aria-pressed="false">Artikel</button><button class="chip" data-f="pengumuman" aria-pressed="false">Pengumuman</button>
+          <label class="search"><i data-ic="search"></i><input id="q" type="text" placeholder="Cari judul…" aria-label="Cari judul konten"></label>
+        </div>
+        <div class="tbl-wrap"><table><thead><tr><th>Judul</th><th>Jenis</th><th>Status</th><th>Tanggal</th><th style="text-align:right">Aksi</th></tr></thead><tbody id="postRows"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- EDITOR -->
+    <section data-v="editor" hidden>
+      <div class="top"><div><h1 id="edTitle">Tulis konten baru</h1><p>Konten berstatus <b>Terbit</b> langsung tampil di halaman publik (prototipe: disimpan di browser ini).</p></div><button class="btn btn-ghost" data-go="posts"><i data-ic="back"></i>Kembali ke daftar</button></div>
+      <form class="editor" id="edForm" novalidate>
+        <div class="card pane">
+          <div class="field"><label for="fType">Jenis konten</label>
+            <select id="fType"><option value="berita">Berita — kegiatan & kabar klinik</option><option value="artikel">Artikel kesehatan — edukasi, wajib ditinjau dokter</option><option value="pengumuman">Pengumuman — jadwal, libur, perubahan layanan</option></select></div>
+          <div class="field"><label for="fTitle">Judul</label><input id="fTitle" class="title-input" type="text" maxlength="120" placeholder="Contoh: Jadwal praktik selama libur Natal 2026"><span class="hint"><span>Judul jelas dan faktual, tanpa klaim berlebihan.</span><span id="cTitle" class="mono">0/120</span></span></div>
+          <div class="field"><label for="fExcerpt">Ringkasan</label><textarea id="fExcerpt" rows="2" maxlength="200" placeholder="1–2 kalimat yang tampil di kartu dan hasil pencarian."></textarea><span class="hint"><span>Dipakai juga sebagai meta description.</span><span id="cEx">0/200</span></span></div>
+          <div class="field"><label for="fBody">Isi</label>
+            <div class="rte-bar" role="toolbar" aria-label="Format teks"><button type="button" data-md="## " title="Subjudul">H2</button><button type="button" data-md="**" title="Tebal">B</button><button type="button" data-md="_" title="Miring"><i>I</i></button><button type="button" data-md="- " title="Daftar">• Daftar</button><button type="button" data-md="[teks](https://)" title="Tautan">Tautan</button><button type="button" data-md="![keterangan gambar](url)" title="Gambar">Gambar</button></div>
+            <textarea id="fBody" class="rte" placeholder="Tulis isi konten. Pisahkan paragraf dengan baris kosong."></textarea>
+            <span class="hint"><span>Produksi: editor teks kaya (mis. Lexical/TipTap) dengan unggah gambar dan teks alternatif.</span></span></div>
+        </div>
+        <div style="display:grid;gap:16px">
+          <div class="card pane">
+            <b>Publikasi</b>
+            <div class="field"><label for="fDate">Tanggal terbit</label><input id="fDate" type="date"><span class="hint"><span>Tanggal di masa depan = terjadwal.</span></span></div>
+            <div class="field"><label for="fAuthor">Penulis</label><input id="fAuthor" type="text" value="Nadia (Tim Humas)"></div>
+            <div class="field" id="revWrap"><label for="fReviewer">Peninjau medis</label><select id="fReviewer"><option value="">— Pilih dokter —</option><option>dr. Anindya Prameswari</option><option>dr. Rafi Kurniawan</option><option>dr. Clara Wulandari, Sp.A</option><option>drg. Bima Aryasatya</option></select><span class="hint"><span>Wajib untuk artikel kesehatan.</span></span></div>
+            <div id="pinWrap" hidden style="display:grid;gap:10px">
+              <label class="check"><input type="checkbox" id="fPin" checked><span>Sematkan di bilah pengumuman atas</span></label>
+              <div class="field"><label for="fExp">Tampil sampai</label><input id="fExp" type="date"><span class="hint"><span>Setelah tanggal ini, pengumuman otomatis turun dari bilah atas.</span></span></div>
+            </div>
+            <div class="field"><span style="font-size:13px;font-weight:700">Gaya sampul</span><div class="swatches" id="swatches" role="group" aria-label="Pilih gaya sampul"></div><span class="hint"><span>Produksi: unggah foto sampul 1600×900, maks. 500 KB, teks alternatif wajib.</span></span></div>
+            <p class="err" id="edErr" hidden></p>
+            <div class="sticky-actions"><button type="button" class="btn btn-ghost" id="saveDraft">Simpan draf</button><button type="submit" class="btn btn-primary" id="publishBtn"><i data-ic="send"></i>Terbitkan</button></div>
+          </div>
+          <div class="card pane">
+            <b>Pratinjau hasil pencarian</b>
+            <div class="serp"><div class="u">luminamedika.id › kabar › <span id="slug">judul-konten</span></div><div class="t" id="serpT">Judul konten | Klinik Lumina Medika</div><div class="d" id="serpD">Ringkasan konten akan tampil di sini.</div></div>
+            <p class="note">Artikel kesehatan mengikuti etika publikasi: berbasis bukti, mencantumkan nama & alamat fasilitas, tanpa diskon/imbalan dan tanpa membandingkan mutu dengan fasilitas lain.</p>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- TESTIMONI -->
+    <section data-v="testi" hidden>
+      <div class="top"><div><h1>Moderasi testimoni</h1><p>Testimoni hanya tampil setelah disetujui dan pasien memberikan persetujuan tertulis.</p></div></div>
+      <div class="mod-grid" id="modGrid"></div>
+      <p class="note" style="margin-top:16px">Pedoman moderasi: tampilkan pengalaman layanan (keramahan, waktu tunggu, kebersihan). Tolak testimoni yang menjanjikan kesembuhan, menyebut diagnosis/obat secara spesifik, membandingkan dengan fasilitas lain, atau memuat data pribadi pihak ketiga.</p>
+    </section>
+
+    <!-- GALERI -->
+    <section data-v="gallery" hidden>
+      <div class="top"><div><h1>Galeri foto</h1><p>Kelola album. Foto dikompresi otomatis ke WebP dan wajib diberi keterangan.</p></div></div>
+      <div class="card"><div class="toolbar" id="albTabs"></div><div class="alb-grid" id="albGrid"></div></div>
+      <p class="note" style="margin-top:12px">Unggah di prototipe hanya membuat pratinjau lokal. Foto pasien hanya boleh dipublikasikan dengan persetujuan tertulis; wajah pasien anak disamarkan.</p>
+    </section>
+
+    <!-- MITRA -->
+    <section data-v="partners" hidden>
+      <div class="top"><div><h1>Mitra</h1><p>Logo tampil berurutan di strip mitra halaman depan.</p></div><button class="btn btn-primary" type="button" id="addPartner"><i data-ic="plus"></i>Tambah mitra</button></div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Urutan</th><th>Nama</th><th>Kategori</th><th>Tautan</th><th>Tampil</th><th style="text-align:right">Aksi</th></tr></thead><tbody id="partnerRows"></tbody></table></div></div>
+    </section>
+
+    <!-- DOKTER -->
+    <section data-v="doctors" hidden>
+      <div class="top"><div><h1>Dokter & jadwal</h1><p>Jadwal mingguan yang tampil di halaman Dokter & Jadwal serta status "Dokter praktik hari ini".</p></div></div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Dokter</th><th>Sen</th><th>Sel</th><th>Rab</th><th>Kam</th><th>Jum</th><th>Sab</th><th>Min</th></tr></thead><tbody id="docRows"></tbody></table></div></div>
+      <p class="note" style="margin-top:12px">Produksi: jadwal disinkronkan dari sistem pendaftaran/RME klinik agar tidak diisi dua kali. Nomor STR/SIP dokter disimpan di profil dokter.</p>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+"use strict";
+const I={grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+news:'<path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/>',
+chat:'<path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/>',
+image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>',
+hand:'<path d="M8 12l3 3 5-5"/><circle cx="12" cy="12" r="9"/>',
+stetho:'<path d="M5 3H4a1 1 0 0 0-1 1v5a5 5 0 0 0 10 0V4a1 1 0 0 0-1-1h-1"/><path d="M8 14v1a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',monitor:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+upload:'<path d="M12 16V4M6 10l6-6 6 6M4 20h16"/>'};
+const ic=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${I[n]||""}</svg>`;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2600)}
+const todayStr=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const fmt=s=>new Date(s+"T00:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
+
+/* theme */
+const root=document.documentElement,mq=matchMedia("(prefers-color-scheme: dark)"),MODES=["system","light","dark"],L={system:"Sistem",light:"Terang",dark:"Gelap"},N={system:"monitor",light:"sun",dark:"moon"};
+let mode=store.get("lm-theme","system"); if(!MODES.includes(mode))mode="system";
+function applyTheme(){if(mode==="system")root.removeAttribute("data-theme");else root.setAttribute("data-theme",mode);$("#themeIcon").innerHTML=ic(N[mode]);$("#themeLbl").textContent="Tema: "+L[mode]}
+$("#themeBtn").onclick=()=>{mode=MODES[(MODES.indexOf(mode)+1)%3];store.set("lm-theme",mode);applyTheme()};
+
+/* data contoh (sama dengan halaman publik) */
+const DEFAULT_POSTS=[
+ {id:"p1",type:"pengumuman",pinned:true,expires:"2026-10-15",title:"Mulai 1 Oktober 2026, Poli Gigi buka juga hari Jumat sore pukul 13.00–19.00",date:"2026-09-24",status:"terbit",author:"Tim Admin"},
+ {id:"p2",type:"artikel",title:"Demam berdarah saat musim hujan: kenali tanda bahaya pada hari ke-3 sampai ke-5",date:"2026-09-22",status:"terbit",author:"dr. Anindya Prameswari",reviewer:"dr. Rafi Kurniawan"},
+ {id:"p3",type:"berita",title:"Lumina Medika membuka layanan laboratorium dengan hasil di hari yang sama",date:"2026-09-15",status:"terbit",author:"Tim Humas"},
+ {id:"p4",type:"pengumuman",pinned:true,title:"Pendaftaran vaksin influenza musim 2026 dibuka, kuota 150 dosis",date:"2026-09-18",status:"terbit",author:"Tim Admin"},
+ {id:"p5",type:"artikel",title:"Kapan anak perlu imunisasi kejar? Panduan singkat untuk orang tua",date:"2026-09-08",status:"terbit",author:"dr. Clara Wulandari, Sp.A",reviewer:"dr. Clara Wulandari, Sp.A"},
+ {id:"p6",type:"berita",title:"Pemeriksaan gigi gratis untuk 120 siswa SD di Kebayoran Baru",date:"2026-09-02",status:"terbit",author:"Tim Humas"}
+];
+const COVERS=[["#FFCC29","#EC268F"],["#722975","#EC268F"],["#0B7CC2","#082DF7"],["#722975","#0B7CC2"],["#EC268F","#722975"],["#082DF7","#0B7CC2"]];
+let mine=store.get("lm_cms_posts_v1",[]), hidden=new Set(store.get("lm_cms_hidden_v1",[]));
+const save=()=>{store.set("lm_cms_posts_v1",mine);store.set("lm_cms_hidden_v1",[...hidden])};
+const all=()=>[...mine.map(p=>({...p,own:true})),...DEFAULT_POSTS.filter(p=>!hidden.has(p.id))].sort((a,b)=>b.date.localeCompare(a.date));
+const statusOf=p=>p.status==="terbit"&&p.date>todayStr()?"terjadwal":p.status;
+const TL={berita:"Berita",artikel:"Artikel",pengumuman:"Pengumuman"},SL={terbit:"Terbit",draf:"Draf",terjadwal:"Terjadwal",menunggu:"Menunggu tinjauan"};
+
+/* router */
+function go(v){
+  if(v==="new"){resetEditor();v="editor"}
+  $$("[data-v]").forEach(s=>s.hidden=s.dataset.v!==v);
+  $$(".nav-btn").forEach(b=>b.toggleAttribute("aria-current",b.dataset.view===v||(v==="editor"&&b.dataset.view==="posts")));
+  $$(".nav-btn[aria-current]").forEach(b=>b.setAttribute("aria-current","page"));
+  renderAll(); scrollTo(0,0);
+}
+document.addEventListener("click",e=>{const n=e.target.closest("[data-view]");if(n)go(n.dataset.view);const g=e.target.closest("[data-go]");if(g)go(g.dataset.go)});
+
+/* dashboard */
+function renderDash(){
+  const a=all();$("#kPub").textContent=a.filter(p=>statusOf(p)==="terbit").length;$("#kDraft").textContent=a.filter(p=>statusOf(p)!=="terbit").length;
+  $("#kMod").textContent=TESTI.filter(t=>t.st==="menunggu").length;$("#kPin").textContent=a.filter(p=>p.type==="pengumuman"&&p.pinned&&statusOf(p)==="terbit"&&(!p.expires||p.expires>=todayStr())).length;
+  $("#modCount").textContent=TESTI.filter(t=>t.st==="menunggu").length;
+  $("#activity").innerHTML=a.slice(0,5).map(p=>`<tr><td class="title"><b>${esc(p.title)}</b><small>${esc(p.author||"")}</small></td><td><span class="tag tag-${p.type}">${TL[p.type]}</span></td><td><span class="st st-${statusOf(p)}">${SL[statusOf(p)]}</span></td><td class="num">${fmt(p.date)}</td></tr>`).join("");
+}
+/* posts */
+let pf="semua",confirmId=null;
+function renderPosts(){
+  const q=$("#q").value.trim().toLowerCase();
+  const rows=all().filter(p=>(pf==="semua"||p.type===pf)&&(!q||p.title.toLowerCase().includes(q)));
+  $("#postRows").innerHTML=rows.map(p=>`<tr><td class="title"><b>${esc(p.title)}</b><small>${esc(p.author||"")}${p.reviewer?" · ditinjau "+esc(p.reviewer):""}${p.own?"":" · konten contoh"}${p.pinned&&p.type==="pengumuman"?" · disematkan":""}</small></td>
+   <td><span class="tag tag-${p.type}">${TL[p.type]}</span></td><td><span class="st st-${statusOf(p)}">${SL[statusOf(p)]}</span></td><td class="num">${fmt(p.date)}</td>
+   <td>${confirmId===p.id?`<div class="inline-confirm"><span>Hapus dari situs?</span><button class="btn btn-danger btn-sm" data-del-yes="${p.id}">Ya, hapus</button><button class="btn btn-ghost btn-sm" data-del-no>Batal</button></div>`
+   :`<div class="actions">${p.own?`<button class="btn btn-ghost btn-sm" data-edit="${p.id}">Edit</button>`:""}<a class="btn btn-ghost btn-sm" href="index.html#kabar">Lihat</a><button class="btn btn-danger btn-sm" data-del="${p.id}">Hapus</button></div>`}</td></tr>`).join("")||`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">Tidak ada konten yang cocok.</td></tr>`;
+}
+$("#postFilter").addEventListener("click",e=>{const c=e.target.closest("[data-f]");if(!c)return;pf=c.dataset.f;$$("#postFilter [data-f]").forEach(b=>b.setAttribute("aria-pressed",b===c));renderPosts()});
+$("#q").addEventListener("input",renderPosts);
+$("#postRows").addEventListener("click",e=>{
+  const d=e.target.closest("[data-del]"),y=e.target.closest("[data-del-yes]"),n=e.target.closest("[data-del-no]"),ed=e.target.closest("[data-edit]");
+  if(d){confirmId=d.dataset.del;renderPosts()}
+  if(n){confirmId=null;renderPosts()}
+  if(y){const id=y.dataset.delYes;if(mine.some(p=>p.id===id))mine=mine.filter(p=>p.id!==id);else hidden.add(id);save();confirmId=null;renderAll();toast("Konten dihapus dari situs")}
+  if(ed){loadEditor(ed.dataset.edit)}
+});
+
+/* editor */
+let editId=null,cover=1;
+$("#swatches").innerHTML=COVERS.map((c,i)=>`<button type="button" class="sw" data-sw="${i}" aria-label="Sampul ${i+1}" style="background:linear-gradient(135deg,${c[0]} 50%,${c[1]} 50%)"></button>`).join("");
+$("#swatches").addEventListener("click",e=>{const b=e.target.closest("[data-sw]");if(b){cover=+b.dataset.sw;markSw()}});
+const markSw=()=>$$("[data-sw]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.sw===cover));
+const slugify=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"judul-konten";
+function syncEditor(){
+  const t=$("#fType").value;$("#pinWrap").hidden=t!=="pengumuman";$("#revWrap").hidden=t!=="artikel";
+  $("#cTitle").textContent=$("#fTitle").value.length+"/120";$("#cEx").textContent=$("#fExcerpt").value.length+"/200";
+  $("#slug").textContent=slugify($("#fTitle").value);$("#serpT").textContent=($("#fTitle").value||"Judul konten")+" | Klinik Lumina Medika";$("#serpD").textContent=$("#fExcerpt").value||"Ringkasan konten akan tampil di sini.";
+  $("#publishBtn").lastChild.textContent=$("#fDate").value>todayStr()?"Jadwalkan":"Terbitkan";
+}
+["fType","fTitle","fExcerpt","fDate"].forEach(id=>$("#"+id).addEventListener("input",syncEditor));
+function resetEditor(){editId=null;$("#edForm").reset();$("#fAuthor").value="Nadia (Tim Humas)";$("#fDate").value=todayStr();const e=new Date();e.setDate(e.getDate()+14);$("#fExp").value=e.toISOString().slice(0,10);cover=1;markSw();$("#edTitle").textContent="Tulis konten baru";$("#edErr").hidden=true;syncEditor()}
+function loadEditor(id){const p=mine.find(x=>x.id===id);if(!p)return;go("editor");editId=id;$("#edTitle").textContent="Edit konten";$("#fType").value=p.type;$("#fTitle").value=p.title;$("#fExcerpt").value=p.excerpt;$("#fBody").value=p.body||"";$("#fDate").value=p.date;$("#fAuthor").value=p.author;$("#fReviewer").value=p.reviewer||"";$("#fPin").checked=!!p.pinned;$("#fExp").value=p.expires||"";cover=p.cover??1;markSw();syncEditor()}
+$$(".rte-bar [data-md]").forEach(b=>b.onclick=()=>{const ta=$("#fBody"),m=b.dataset.md,s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.slice(s,e);const ins=(m==="**"||m==="_")?m+(sel||"teks")+m:(m.endsWith(" ")?"\n"+m+sel:m);ta.setRangeText(ins,s,e,"end");ta.focus()});
+function collect(status){
+  const p={id:editId||"u"+Date.now(),type:$("#fType").value,title:$("#fTitle").value.trim(),excerpt:$("#fExcerpt").value.trim(),body:$("#fBody").value.trim(),date:$("#fDate").value||todayStr(),author:$("#fAuthor").value.trim()||"Tim Admin",reviewer:$("#fType").value==="artikel"?$("#fReviewer").value:"",pinned:$("#fType").value==="pengumuman"&&$("#fPin").checked,expires:$("#fType").value==="pengumuman"?$("#fExp").value:"",cover,status,read:Math.max(1,Math.round(($("#fBody").value.split(/\s+/).length)/200))};
+  const miss=[];if(!p.title)miss.push("judul");if(status==="terbit"){if(!p.excerpt)miss.push("ringkasan");if(p.type==="artikel"&&!p.reviewer)miss.push("peninjau medis")}
+  if(miss.length){$("#edErr").textContent="Belum bisa disimpan. Lengkapi: "+miss.join(", ")+".";$("#edErr").hidden=false;return null}
+  $("#edErr").hidden=true;return p;
+}
+function persist(p){const i=mine.findIndex(x=>x.id===p.id);if(i>=0)mine[i]=p;else mine.unshift(p);save()}
+$("#saveDraft").onclick=()=>{const p=collect("draf");if(p){persist(p);editId=p.id;toast("Draf disimpan");renderAll()}};
+$("#edForm").addEventListener("submit",e=>{e.preventDefault();const p=collect("terbit");if(!p)return;persist(p);toast(p.date>todayStr()?"Dijadwalkan terbit "+fmt(p.date):"Diterbitkan. Buka situs publik untuk melihatnya.");go("posts")});
+
+/* testimoni */
+const TESTI=[
+ {n:"Rina S.",svc:"Poli Anak",r:5,q:"Anak saya biasanya takut ke dokter. Dokternya sabar dan menjelaskan dengan bahasa yang mudah dipahami.",c:true,st:"terbit",d:"2026-08-12"},
+ {n:"Lukas T.",svc:"Poli Umum",r:5,q:"Pendaftaran online cepat, saya datang 10 menit sebelum dipanggil. Ruang tunggu nyaman.",c:true,st:"menunggu",d:"2026-09-25"},
+ {n:"Anonim",svc:"Poli Gigi",r:3,q:"Dokternya baik, tapi saya menunggu hampir 40 menit meski sudah daftar online.",c:false,st:"menunggu",d:"2026-09-24"},
+ {n:"Hendra W.",svc:"Laboratorium",r:5,q:"Obat dari sini pasti menyembuhkan diabetes saya, lebih bagus dari klinik sebelah!",c:true,st:"menunggu",d:"2026-09-23"}
+];
+function renderTesti(){
+  $("#modGrid").innerHTML=TESTI.map((t,i)=>`<article class="card mod"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(t.n)}</b><span class="st st-${t.st==="ditolak"?"draf":t.st}">${t.st==="terbit"?"Tampil":t.st==="ditolak"?"Ditolak":"Menunggu"}</span></div>
+  <q>${esc(t.q)}</q><div class="meta"><span>${t.svc}</span><span>${"★".repeat(t.r)}${"☆".repeat(5-t.r)}</span><span>${fmt(t.d)}</span></div>
+  <div class="consent" style="color:${t.c?"var(--ok)":"var(--accent-text)"}">${t.c?"✓ Formulir persetujuan publikasi ditandatangani":"✕ Belum ada persetujuan publikasi"}</div>
+  ${/sembuh|lebih bagus|klinik sebelah/i.test(t.q)?`<div class="note" style="color:var(--accent-text)">Peringatan: memuat klaim kesembuhan / perbandingan dengan fasilitas lain.</div>`:""}
+  ${t.st==="menunggu"?`<div class="actions" style="justify-content:flex-start"><button class="btn btn-primary btn-sm" data-ok="${i}" ${t.c?"":"disabled title='Butuh persetujuan pasien'"} style="${t.c?"":"opacity:.5;cursor:not-allowed"}">Setujui & tampilkan</button><button class="btn btn-ghost btn-sm" data-no="${i}">Tolak</button></div>`:""}</article>`).join("");
+}
+$("#modGrid").addEventListener("click",e=>{const o=e.target.closest("[data-ok]:not([disabled])"),n=e.target.closest("[data-no]");if(o){TESTI[o.dataset.ok].st="terbit";toast("Testimoni ditampilkan")}if(n){TESTI[n.dataset.no].st="ditolak";toast("Testimoni ditolak")}renderAll()});
+
+/* galeri */
+const ALB={"Fasilitas":[["Ruang tunggu","#722975","#EC268F"],["Laboratorium","#0B7CC2","#082DF7"],["Ruang praktik gigi","#082DF7","#0B7CC2"],["Farmasi","#722975","#0B7CC2"]],"Tim":[["Tim dokter umum","#EC268F","#722975"],["Resepsionis","#722975","#FFF212"]],"Kegiatan":[["Bakti sosial sekolah","#FFCC29","#EC268F"],["Vaksinasi influenza","#0B7CC2","#FFCC29"]]};
+let alb="Fasilitas";
+function renderGal(){
+  $("#albTabs").innerHTML=Object.keys(ALB).map(a=>`<button class="chip" aria-pressed="${a===alb}" data-alb="${a}">${a} · ${ALB[a].length}</button>`).join("");
+  $("#albGrid").innerHTML=ALB[alb].map(([t,a,b,src])=>`<div class="thumb">${src?`<img src="${src}" alt="${esc(t)}">`:`<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="${a}"/><circle cx="70" cy="40" r="42" fill="${b}"/></svg>`}<span>${esc(t)}</span></div>`).join("")+`<label class="drop" for="upl">${ic("upload")}<span>Unggah foto<br><small>JPG/PNG, maks. 5 MB</small></span></label><input id="upl" type="file" accept="image/*" multiple hidden>`;
+  $("#upl").onchange=e=>{[...e.target.files].forEach(f=>{const r=new FileReader();r.onload=()=>{ALB[alb].push([f.name.replace(/\.[^.]+$/,""),"","",r.result]);renderGal();toast("Pratinjau ditambahkan ke album "+alb)};r.readAsDataURL(f)})};
+}
+$("#albTabs").addEventListener("click",e=>{const b=e.target.closest("[data-alb]");if(b){alb=b.dataset.alb;renderGal()}});
+
+/* mitra */
+const PARTNERS=[["Asuransi Nirmala","Asuransi"],["Prima Diagnostika","Laboratorium"],["PT Samudra Logistik","Korporat"],["RS Harapan Kasih","RS rujukan"],["Bina Proteksi","Asuransi"],["Kopkar Sentosa","Korporat"],["Apotek Bestari","Farmasi"],["Universitas Cakrawala","Pendidikan"]].map(([n,k])=>({n,k,on:true}));
+function renderPartners(){$("#partnerRows").innerHTML=PARTNERS.map((p,i)=>`<tr><td class="num">${String(i+1).padStart(2,"0")}</td><td><b>${esc(p.n)}</b></td><td>${p.k}</td><td style="color:var(--muted);font-size:13px">situs mitra (opsional)</td><td><label class="check"><input type="checkbox" data-on="${i}" ${p.on?"checked":""} aria-label="Tampilkan ${esc(p.n)}"></label></td><td><div class="actions"><button class="btn btn-ghost btn-sm" data-up="${i}" ${i===0?"disabled":""} aria-label="Naikkan urutan">↑</button><button class="btn btn-ghost btn-sm" data-down="${i}" ${i===PARTNERS.length-1?"disabled":""} aria-label="Turunkan urutan">↓</button></div></td></tr>`).join("")}
+$("#partnerRows").addEventListener("click",e=>{const u=e.target.closest("[data-up]"),d=e.target.closest("[data-down]"),o=e.target.closest("[data-on]");if(u){const i=+u.dataset.up;[PARTNERS[i-1],PARTNERS[i]]=[PARTNERS[i],PARTNERS[i-1]];renderPartners()}if(d){const i=+d.dataset.down;[PARTNERS[i+1],PARTNERS[i]]=[PARTNERS[i],PARTNERS[i+1]];renderPartners()}if(o){PARTNERS[o.dataset.on].on=o.checked;toast(o.checked?"Logo ditampilkan":"Logo disembunyikan")}});
+$("#addPartner").onclick=()=>{PARTNERS.push({n:"Mitra baru "+(PARTNERS.length+1),k:"Korporat",on:false});renderPartners();toast("Baris mitra ditambahkan (lengkapi nama & logo)")};
+
+/* dokter */
+const DOCS=[["dr. Anindya Prameswari",{1:"07.00–14.00",2:"07.00–14.00",3:"07.00–14.00",4:"07.00–14.00",5:"07.00–11.00",0:"08.00–13.00"}],["dr. Rafi Kurniawan",{1:"14.00–21.00",2:"14.00–21.00",3:"14.00–21.00",4:"14.00–21.00",5:"13.00–21.00",6:"08.00–15.00"}],["dr. Maya Lestari",{6:"15.00–21.00",0:"13.00–20.00"}],["drg. Bima Aryasatya",{1:"09.00–15.00",3:"09.00–15.00",5:"13.00–19.00",6:"09.00–13.00"}],["drg. Salsabila Putri",{2:"15.00–20.00",4:"15.00–20.00",0:"09.00–13.00"}],["dr. Clara Wulandari, Sp.A",{2:"16.00–19.00",4:"16.00–19.00",6:"09.00–12.00"}],["Bd. Rina Oktaviani, S.Tr.Keb",{1:"08.00–14.00",3:"08.00–14.00",5:"08.00–14.00"}]];
+function renderDocs(){$("#docRows").innerHTML=DOCS.map(([n,s])=>`<tr><td><b>${n}</b></td>${[1,2,3,4,5,6,0].map(d=>`<td class="num" style="color:${s[d]?"var(--ink)":"var(--muted)"}">${s[d]||"—"}</td>`).join("")}</tr>`).join("")}
+
+function renderAll(){renderDash();renderPosts();renderTesti();renderGal();renderPartners();renderDocs()}
+document.querySelectorAll("i[data-ic]").forEach(el=>el.outerHTML=ic(el.dataset.ic));
+applyTheme();resetEditor();renderAll();
+})();
+</script>
+</body>
+</html>
