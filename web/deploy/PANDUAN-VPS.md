@@ -39,7 +39,9 @@ hPanel → **Domains** → `bintangusadabakti.com` → **DNS / Nameservers** →
 | A | `@` | IP publik VPS | 3600 |
 | A | `www` | IP publik VPS | 3600 |
 
-Hapus record **A**, **AAAA**, atau **CNAME** lain untuk `@` dan `www`. Cek dari VPS sampai muncul IP VPS (bisa beberapa menit sampai beberapa jam):
+Hapus record **A**, **AAAA**, atau **CNAME** lain untuk `@` dan `www`.
+
+**Bila nameserver domain adalah Cloudflare** (hPanel → Domains → Nameservers berisi `*.ns.cloudflare.com`), record di hPanel **tidak berlaku**. Atur di Cloudflare → domain → **DNS → Records**: `A @ → IP VPS` dan `CNAME www → bintangusadabakti.com`, keduanya **Proxy status: DNS only (awan abu-abu)** agar certbot di VPS bisa menerbitkan sertifikat dan tidak terjadi redirect loop. Jangan ubah record lain (mis. subdomain yang dipakai sistem lain, MX, TXT), dan jangan klik **Ubah nameserver** di hPanel. Cek dari VPS sampai muncul IP VPS (bisa beberapa menit sampai beberapa jam):
 
 ```bash
 getent hosts bintangusadabakti.com www.bintangusadabakti.com
