@@ -501,3 +501,12 @@ footer .brand small{color:#B9AEC2}
 a.post{text-decoration:none;color:inherit}
 .notice{font-size:13.5px;color:var(--muted);background:var(--surface-2);border-radius:12px;padding:14px 16px}
 .svc .btn{margin-top:auto;align-self:flex-start}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.tcard.shot{padding:12px;gap:10px}
+.tcard.shot figcaption{justify-content:space-between;padding:10px 6px 2px}
+.shot-btn{all:unset;cursor:zoom-in;display:block;border-radius:10px;overflow:hidden;background:#fff;border:1px solid var(--line);max-height:420px}
+.shot-btn:focus-visible{outline:3px solid var(--info-decor);outline-offset:2px}
+.shot-btn img{width:100%;height:auto;display:block}
+.lb-cap .btn{margin-top:4px}
+.marquee.static{mask-image:none;-webkit-mask-image:none}
+.marquee.static .marquee-track{animation:none;flex-wrap:wrap;width:auto}

@@ -1,9 +1,15 @@
 import * as migration_20260928_051359_initial from './20260928_051359_initial';
+import * as migration_20260928_055646_testimoni_screenshot from './20260928_055646_testimoni_screenshot';
 
 export const migrations = [
   {
     up: migration_20260928_051359_initial.up,
     down: migration_20260928_051359_initial.down,
-    name: '20260928_051359_initial'
+    name: '20260928_051359_initial',
+  },
+  {
+    up: migration_20260928_055646_testimoni_screenshot.up,
+    down: migration_20260928_055646_testimoni_screenshot.down,
+    name: '20260928_055646_testimoni_screenshot'
   },
 ];

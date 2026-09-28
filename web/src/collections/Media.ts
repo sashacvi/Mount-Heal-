@@ -19,6 +19,8 @@ export const Media: CollectionConfig = {
       { name: 'card', width: 960, height: 540, formatOptions: webp },
       { name: 'square', width: 720, height: 720, formatOptions: webp },
       { name: 'large', width: 1800, formatOptions: webp },
+      // Lebar tetap tanpa potong: untuk screenshot ulasan.
+      { name: 'review', width: 900, formatOptions: webp },
     ],
   },
   fields: [

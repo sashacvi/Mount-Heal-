@@ -246,6 +246,14 @@ export interface Media {
       filesize?: number | null;
       filename?: string | null;
     };
+    review?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
   };
 }
 /**
@@ -357,16 +365,27 @@ export interface Gallery {
   createdAt: string;
 }
 /**
- * Ulasan Google dapat diisi manual atau lewat sinkronisasi (npm run sync:google-reviews). Tampilkan ulasan yang menggambarkan pengalaman layanan, bukan janji kesembuhan.
+ * Cara tercepat: pilih format "Screenshot ulasan", unggah tangkapan layar ulasan dari Google Maps, isi nama pengulas, lalu centang "Tampilkan di situs". Pilih ulasan yang menggambarkan pengalaman layanan, bukan janji kesembuhan.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "testimonials".
  */
 export interface Testimonial {
   id: number;
+  format: 'screenshot' | 'teks';
+  /**
+   * Potong gambar agar hanya berisi satu ulasan (nama, bintang, tanggal, isi). Pada kolom "Teks alternatif" media, tulis ringkas isi ulasan.
+   */
+  screenshot?: (number | null) | Media;
   authorName: string;
-  rating: number;
-  text: string;
+  /**
+   * Wajib untuk format teks. Untuk screenshot, opsional (dipakai untuk mesin pencari).
+   */
+  rating?: number | null;
+  /**
+   * Wajib untuk format teks. Untuk screenshot, sebaiknya tetap diisi agar terbaca oleh pembaca layar dan Google.
+   */
+  text?: string | null;
   source: 'google' | 'langsung';
   reviewUrl?: string | null;
   /**
@@ -698,6 +717,8 @@ export interface GallerySelect<T extends boolean = true> {
  * via the `definition` "testimonials_select".
  */
 export interface TestimonialsSelect<T extends boolean = true> {
+  format?: T;
+  screenshot?: T;
   authorName?: T;
   rating?: T;
   text?: T;
@@ -789,6 +810,16 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
         large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        review?:
           | T
           | {
               url?: T;
@@ -937,6 +968,7 @@ export interface SiteSetting {
   hoursNote?: string | null;
   team?: {
     doctors?: number | null;
+    dentists?: number | null;
     midwives?: number | null;
     nurses?: number | null;
     pharmacists?: number | null;
@@ -991,6 +1023,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
     | T
     | {
         doctors?: T;
+        dentists?: T;
         midwives?: T;
         nurses?: T;
         pharmacists?: T;

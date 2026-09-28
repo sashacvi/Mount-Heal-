@@ -67,20 +67,20 @@ await payload.updateGlobal({
     intro:
       'Poli umum, poli gigi, KIA & KB, laboratorium sederhana, apotek, medical check-up, dan home care. Melayani pasien umum dan BPJS Kesehatan setiap hari pukul 08.00–21.00 WITA.',
     about:
-      'Klinik Mustika Sekar Taji berdiri pada 2024 dan melayani masyarakat Kintamani serta sekitarnya, baik pasien umum maupun peserta BPJS Kesehatan. Klinik telah terakreditasi Utama.\n\nPelayanan didukung 3 dokter, 4 bidan, 6 perawat, serta tim farmasi yang terdiri atas 1 apoteker dan 2 asisten apoteker.',
+      'Klinik Mustika Sekar Taji (sebelumnya bernama Bintang Usada Bhakti) berdiri pada 2024 dan melayani masyarakat Lembean, Kintamani, serta sekitarnya, baik pasien umum maupun peserta BPJS Kesehatan. Klinik telah terakreditasi Utama.\n\nPelayanan didukung 2 dokter umum, 1 dokter gigi, 4 bidan, 6 perawat, serta tim farmasi yang terdiri atas 1 apoteker dan 2 asisten apoteker.',
     foundedYear: 2024,
     accreditation: 'Utama',
     serviceModes: 'Umum dan BPJS',
     insurance: 'BPJS Kesehatan',
-    // PERLU DIKONFIRMASI: alamat jalan lengkap & koordinat pasti dari pin Google Maps klinik.
-    address: 'Desa Lembean, Kecamatan Kintamani\nKabupaten Bangli, Bali 80652',
+    address: 'Jalan Raya Desa Lembean, Lembean, Kec. Kintamani\nKabupaten Bangli, Bali 80652',
+    // Koordinat pusat Desa Lembean. Ganti dengan koordinat pin klinik dari Google Maps bila tersedia.
     mapsUrl: 'https://maps.app.goo.gl/LAKbhRadhn4KddM16',
     latitude: -8.290927,
     longitude: 115.278522,
     whatsapp: '087864114866',
     hours: everyDay.map((day) => ({ day, open: '08:00', close: '21:00', closed: false })),
-    hoursNote: 'Jadwal dokter berbeda setiap hari. Bidan bertugas bergilir sepanjang jam operasional.',
-    team: { doctors: 3, midwives: 4, nurses: 6, pharmacists: 1, pharmacyAssistants: 2 },
+    hoursNote: 'Jadwal dokter berbeda setiap hari; hari Rabu dokter libur. Bidan bertugas bergilir sepanjang jam operasional.',
+    team: { doctors: 2, dentists: 1, midwives: 4, nurses: 6, pharmacists: 1, pharmacyAssistants: 2 },
     googleReviewsUrl: 'https://maps.app.goo.gl/LAKbhRadhn4KddM16',
   },
 })
@@ -88,7 +88,7 @@ await payload.updateGlobal({
 console.log('[seed] layanan')
 const services = [
   { name: 'Poli Umum', icon: 'stetho', summary: 'Pemeriksaan dan pengobatan keluhan kesehatan umum untuk semua usia, termasuk surat keterangan sehat dan rujukan.', tags: ['Umum', 'BPJS'] },
-  { name: 'Poli Gigi', icon: 'tooth', summary: 'Pemeriksaan dan perawatan kesehatan gigi dan mulut. Tanyakan jadwal layanan gigi melalui WhatsApp.', tags: [] },
+  { name: 'Poli Gigi', icon: 'tooth', summary: 'Pemeriksaan dan perawatan kesehatan gigi dan mulut oleh dokter gigi. Lihat jadwal praktik di bagian Dokter & Jadwal.', tags: [] },
   { name: 'KIA dan KB', icon: 'heart', summary: 'Pemeriksaan kehamilan, kesehatan ibu dan anak, serta konsultasi dan pelayanan keluarga berencana oleh bidan.', tags: ['Bidan setiap hari'] },
   { name: 'Laboratorium Sederhana', icon: 'flask', summary: 'Pemeriksaan laboratorium dasar untuk membantu dokter menegakkan diagnosis. Jenis pemeriksaan dapat ditanyakan ke petugas.', tags: [] },
   { name: 'Apotek / Farmasi', icon: 'pill', summary: 'Pelayanan resep dan informasi penggunaan obat oleh apoteker dan asisten apoteker.', tags: ['Apoteker'] },
@@ -103,10 +103,11 @@ for (const [i, s] of services.entries()) {
 }
 
 const staff = [
-  // PERLU DIKONFIRMASI: penulisan gelar (dr. + S.Ked) dan spesialisasi masing-masing dokter.
-  { name: 'dr. Enjik Ardhi Pradivtha, S.Ked', category: 'dokter', position: 'Dokter Umum', schedule: days(['1', '2', '4', '5', '6', '0'], '08:00', '14:00') },
-  { name: 'dr. I Made Yana Priyatna', category: 'dokter', position: 'Dokter Umum', schedule: days(['5'], '09:00', '17:00') },
+  // Penulisan gelar: "dr." (dokter) dan "drg." (dokter gigi) huruf kecil; "S.Ked" tidak ditulis
+  // karena sudah tercakup dalam gelar profesi dr.
+  { name: 'dr. Enjik Ardhi Pradivtha', category: 'dokter', position: 'Dokter Umum', schedule: days(['1', '2', '4', '5', '6', '0'], '08:00', '14:00') },
   { name: 'dr. Ni Wayan Gunasri, M.Kes', category: 'dokter', position: 'Dokter Umum', schedule: days(['6', '0'], '17:00', '21:00') },
+  { name: 'drg. I Made Yana Priyatna', category: 'dokter-gigi', position: 'Dokter Gigi', schedule: days(['5'], '09:00', '17:00') },
   ...['Ni Kadek Candra Dewi', 'Ni Wayan Kariasih', 'Ni Komang Riantini Kusuma Wiartiani', 'Ni Putu Ayu Rika Maharani'].map((name) => ({
     name,
     category: 'bidan' as const,
@@ -127,8 +128,7 @@ for (const [i, s] of staff.entries()) {
 
 const partners = [
   { name: 'Puskesmas Kintamani I', category: 'puskesmas' },
-  // PERLU DIKONFIRMASI: situs yayasan menyebut nama "Starlight Foundation".
-  { name: 'Star Foundation', category: 'yayasan' },
+  { name: 'Starlight Foundation', category: 'yayasan', url: 'https://starlightfoundation.ch/' },
   { name: 'RS Medika Canti', category: 'rumah-sakit' },
 ] as const
 for (const [i, p] of partners.entries()) {
@@ -137,7 +137,7 @@ for (const [i, p] of partners.entries()) {
 
 const faqs = [
   ['Apakah klinik menerima BPJS Kesehatan?', 'Ya. Klinik melayani pasien umum dan peserta BPJS Kesehatan. Bawa KTP atau kartu JKN digital dari aplikasi Mobile JKN. Bila fasilitas kesehatan tingkat pertama Anda bukan klinik ini, tanyakan ketentuannya lewat WhatsApp sebelum datang.'],
-  ['Kapan klinik buka?', 'Setiap hari pukul 08.00–21.00 WITA. Jadwal dokter berbeda setiap hari, lihat bagian Dokter & Jadwal. Bidan bertugas bergilir sepanjang jam operasional.'],
+  ['Kapan klinik buka?', 'Setiap hari pukul 08.00–21.00 WITA. Jadwal dokter berbeda setiap hari dan dokter libur pada hari Rabu; lihat bagian Dokter & Jadwal. Bidan bertugas bergilir sepanjang jam operasional.'],
   ['Bagaimana cara mendaftar?', 'Tekan tombol Daftar Berobat, isi data singkat, lalu kirim pesan yang sudah terisi ke WhatsApp klinik. Petugas akan membalas dengan konfirmasi. Anda juga dapat datang langsung ke klinik pada jam operasional.'],
   ['Bagaimana cara memesan layanan home care?', 'Hubungi WhatsApp klinik untuk menanyakan jadwal, wilayah jangkauan, dan biaya layanan home care.'],
   ['Untuk apa saja medical check-up?', 'Medical check-up dapat digunakan untuk keperluan pribadi, sekolah, atau pekerjaan, termasuk pembuatan surat keterangan sehat. Tanyakan jenis pemeriksaan dan persiapannya lewat WhatsApp.'],

@@ -40,8 +40,8 @@ export function ScheduleSection({ doctors }: { doctors: StaffLite[] }) {
       <div className="doc-grid" aria-live="polite" style={{ marginTop: 20 }}>
         {list.length === 0 && (
           <div className="empty">
-            Tidak ada jadwal praktik dokter pada hari {DAY_NAMES[selected]}. Bidan tetap bertugas selama jam operasional.
-            Hubungi WhatsApp klinik untuk informasi.
+            Dokter libur pada hari {DAY_NAMES[selected]}. Bidan tetap bertugas selama jam operasional klinik. Hubungi WhatsApp
+            klinik untuk informasi.
           </div>
         )}
         {list.map((d, i) => (

@@ -60,6 +60,7 @@ for (const r of place.reviews ?? []) {
   if (!text) continue
   const existing = await payload.find({ collection: 'testimonials', where: { googleReviewId: { equals: r.name } }, limit: 1 })
   const data = {
+    format: 'teks' as const,
     authorName: r.authorAttribution?.displayName || 'Pengguna Google',
     rating: r.rating,
     text,

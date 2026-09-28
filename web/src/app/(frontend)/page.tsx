@@ -54,7 +54,11 @@ export default async function HomePage() {
   const stats = [
     settings.foundedYear && { v: String(settings.foundedYear), l: 'tahun berdiri' },
     settings.accreditation && { v: settings.accreditation, l: 'status akreditasi' },
-    team.doctors && { v: String(team.doctors), l: 'dokter' },
+    // Digabung agar grid statistik tetap 3 × 2.
+    (team.doctors || team.dentists) && {
+      v: String((team.doctors ?? 0) + (team.dentists ?? 0)),
+      l: team.dentists ? `dokter (${team.doctors ?? 0} umum, ${team.dentists} gigi)` : 'dokter',
+    },
     team.midwives && { v: String(team.midwives), l: 'bidan' },
     team.nurses && { v: String(team.nurses), l: 'perawat' },
     (team.pharmacists || team.pharmacyAssistants) && {
@@ -333,16 +337,30 @@ export default async function HomePage() {
           ) : null}
           {testimonials.length > 0 ? (
             <TestimonialsCarousel
-              items={testimonials.map((t) => ({
-                id: t.id,
-                authorName: t.authorName,
-                rating: t.rating,
-                text: t.text,
-                source: t.source,
-                reviewUrl: t.reviewUrl,
-                reviewDate: t.reviewDate,
-                service: t.service,
-              }))}
+              items={testimonials.map((t) => {
+                const shot = t.format === 'screenshot' ? media(t.screenshot) : null
+                const src = imgUrl(shot, 'review')
+                return {
+                  id: t.id,
+                  format: t.format,
+                  authorName: t.authorName,
+                  rating: t.rating,
+                  text: t.text,
+                  source: t.source,
+                  reviewUrl: t.reviewUrl,
+                  reviewDate: t.reviewDate,
+                  service: t.service,
+                  shot: src
+                    ? {
+                        src,
+                        full: shot?.url ?? src,
+                        alt: shot?.alt || `Screenshot ulasan Google dari ${t.authorName}`,
+                        width: shot?.sizes?.review?.width ?? shot?.width,
+                        height: shot?.sizes?.review?.height ?? shot?.height,
+                      }
+                    : null,
+                }
+              })}
             />
           ) : (
             <div className="review-cta">
@@ -370,8 +388,9 @@ export default async function HomePage() {
               <h2 id="mitraTitle">Mitra kerja sama</h2>
               <p>Fasilitas kesehatan dan lembaga yang bekerja sama dengan klinik.</p>
             </div>
-            <div className="marquee">
-              <div className="marquee-track" style={partners.length < 5 ? { animation: 'none', flexWrap: 'wrap', width: 'auto' } : undefined}>
+            {/* Di bawah 5 mitra, strip dibuat diam (tanpa gerak & tanpa efek pudar tepi). */}
+            <div className={`marquee${partners.length < 5 ? ' static' : ''}`}>
+              <div className="marquee-track">
                 {[...partners, ...(partners.length < 5 ? [] : partners)].map((p, i) => {
                   const logo = media(p.logo)
                   const dup = i >= partners.length

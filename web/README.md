@@ -27,7 +27,7 @@ Buka `http://localhost:3000/admin`. Pengguna pertama yang mendaftar otomatis men
 |---|---|
 | **Konten → Kabar Klinik** | Tulis berita, artikel kesehatan, pengumuman. Bisa draf, jadwalkan terbit, riwayat versi. Artikel wajib punya peninjau medis sebelum terbit. Pengumuman bisa disematkan di bilah kuning atas dengan tanggal kedaluwarsa. |
 | **Konten → Galeri Foto** | Unggah foto per album (Fasilitas, Tim, Kegiatan). Bagian galeri muncul di beranda setelah ada foto. |
-| **Konten → Testimoni** | Ulasan Google (manual atau sinkron) dan testimoni langsung. Testimoni langsung hanya bisa ditampilkan bila ada persetujuan tertulis pasien. |
+| **Konten → Testimoni** | Dua format: **screenshot ulasan Google** (unggah gambar) atau **teks**. Testimoni langsung dari pasien hanya bisa ditampilkan bila ada persetujuan tertulis. |
 | **Konten → Mitra** | Nama, kategori, logo, urutan. Tanpa logo, tampil inisial nama. |
 | **Konten → Tanya Jawab (FAQ)** | Pertanyaan dan jawaban di bagian Info Pasien. |
 | **Klinik → Dokter & Tenaga Kesehatan** | Nama + gelar, foto, jadwal mingguan. Jadwal ini dipakai di bagian Dokter & Jadwal, kartu "Dokter praktik hari ini", dan formulir pendaftaran. |
@@ -43,6 +43,16 @@ Buka `http://localhost:3000/admin`. Pengguna pertama yang mendaftar otomatis men
 - Kabar klinik (`/kabar`, `/kabar/[slug]`), galeri + lightbox, testimoni + rating Google, strip mitra.
 - Peta: OpenStreetMap (gratis, tanpa kunci). Bila `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` diisi, peta memakai Google Maps Embed API.
 - SEO: metadata, Open Graph, `sitemap.xml`, `robots.txt`, schema.org `MedicalClinic` dan `NewsArticle`/`MedicalWebPage`.
+
+## Menambah testimoni dari screenshot ulasan Google
+
+1. Buka profil klinik di Google Maps → tab **Ulasan**. Ambil screenshot **satu ulasan** (nama, bintang, tanggal, isi), lalu potong rapi. Lebar gambar idealnya ≥ 700 px agar tetap terbaca.
+2. Di admin: **Konten → Testimoni → Buat baru**.
+3. Format: **Screenshot ulasan** → unggah gambar. Pada jendela unggah, isi **Teks alternatif** dengan ringkasan ulasan (contoh: "Ulasan bintang 5: pelayanan ramah dan cepat").
+4. Isi **Nama pengulas**. Opsional tetapi disarankan: rating, isi ulasan (disalin), tanggal ulasan, tautan ulasan.
+5. Centang **Tampilkan di situs**, lalu **Simpan**. Urutan tampil diatur lewat kolom **Urutan tampil** (angka kecil lebih dulu).
+
+Di situs, screenshot tampil sebagai kartu yang dapat diperbesar. Pilih ulasan yang menggambarkan pengalaman layanan, bukan klaim kesembuhan.
 
 ## Sinkronisasi ulasan Google (opsional)
 
@@ -66,7 +76,11 @@ Database (`/app/data`) dan foto (`/app/media`) disimpan di volume Docker. Pasang
 
 Tanpa Docker: `npm ci && npm run build && npm start` di server Node.js 20+, dengan folder `data/` dan `media/` yang persisten.
 
-Migrasi database dijalankan otomatis saat server produksi mulai (`prodMigrations`). Setelah mengubah skema koleksi, buat migrasi baru dengan `npm run migrate:create -- nama-perubahan` dan commit berkasnya.
+Migrasi database dijalankan otomatis saat server produksi mulai (`prodMigrations`). Setelah mengubah skema koleksi, buat migrasi baru dengan `npm run migrate:create -- nama-perubahan`, **periksa isinya**, lalu commit berkasnya.
+
+> Generator migrasi SQLite kadang menyalin kolom baru dari tabel lama saat membuat ulang tabel (`INSERT INTO __new_… SELECT "kolom_baru" …`), sehingga migrasi gagal dengan *no such column*. Ganti kolom baru di bagian `SELECT` dengan nilai default. Contoh perbaikan: `src/migrations/20260928_055646_testimoni_screenshot.ts`.
+>
+> Hal yang sama dapat membuat `npm run dev` gagal pada database lokal lama. Untuk database lokal (bukan produksi), hapus `data/klinik.db` lalu jalankan `npm run seed` lagi.
 
 ### Catatan
 

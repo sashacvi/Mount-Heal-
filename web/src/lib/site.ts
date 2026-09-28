@@ -64,7 +64,7 @@ export const getHomeData = cache(async () => {
     payload.find({ collection: 'staff', where: shown, sort: 'order', limit: 100, depth: 1 }),
     getPosts(12),
     payload.find({ collection: 'gallery', where: shown, sort: 'order', limit: 48, depth: 1 }),
-    payload.find({ collection: 'testimonials', where: shown, sort: '-reviewDate', limit: 24, depth: 0 }),
+    payload.find({ collection: 'testimonials', where: shown, sort: 'order', limit: 24, depth: 1 }),
     payload.find({ collection: 'partners', where: shown, sort: 'order', limit: 50, depth: 1 }),
     payload.find({ collection: 'faqs', where: shown, sort: 'order', limit: 50, depth: 0 }),
   ])

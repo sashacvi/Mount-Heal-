@@ -114,11 +114,17 @@ export const SiteSettings: GlobalConfig = {
                 {
                   type: 'row',
                   fields: [
-                    { name: 'doctors', label: 'Dokter', type: 'number', admin: { width: '20%' } },
-                    { name: 'midwives', label: 'Bidan', type: 'number', admin: { width: '20%' } },
-                    { name: 'nurses', label: 'Perawat', type: 'number', admin: { width: '20%' } },
-                    { name: 'pharmacists', label: 'Apoteker', type: 'number', admin: { width: '20%' } },
-                    { name: 'pharmacyAssistants', label: 'Asisten apoteker', type: 'number', admin: { width: '20%' } },
+                    { name: 'doctors', label: 'Dokter umum', type: 'number', admin: { width: '33%' } },
+                    { name: 'dentists', label: 'Dokter gigi', type: 'number', admin: { width: '33%' } },
+                    { name: 'midwives', label: 'Bidan', type: 'number', admin: { width: '33%' } },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'nurses', label: 'Perawat', type: 'number', admin: { width: '33%' } },
+                    { name: 'pharmacists', label: 'Apoteker', type: 'number', admin: { width: '33%' } },
+                    { name: 'pharmacyAssistants', label: 'Asisten apoteker', type: 'number', admin: { width: '33%' } },
                   ],
                 },
               ],

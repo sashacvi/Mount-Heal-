@@ -5,6 +5,17 @@ import { Icon } from './Icon'
 import { OPEN_REGISTER } from './RegisterButton'
 import type { StaffLite } from './types'
 
+const isDental = (service: string) => /gigi/i.test(service)
+
+/** Poli Gigi → dokter gigi; layanan lain → dokter umum. */
+function doctorsFor(service: string, doctors: StaffLite[]) {
+  return doctors.filter((d) => (isDental(service) ? d.category === 'dokter-gigi' : d.category === 'dokter'))
+}
+
+function serviceFor(category: string, services: string[]) {
+  return category === 'dokter-gigi' ? services.find(isDental) : services.find((s) => /umum/i.test(s))
+}
+
 /**
  * Pendaftaran lewat WhatsApp: formulir hanya menyusun pesan, tidak ada data
  * yang disimpan di server situs.
@@ -14,6 +25,8 @@ export function RegistrationDialog({ services, doctors, whatsapp }: { services: 
   const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', service: services[0] ?? '', staff: '', date: '', pay: 'Umum', note: '' })
   const lastFocus = useRef<HTMLElement | null>(null)
+  const doctorsRef = useRef(doctors)
+  doctorsRef.current = doctors
   const firstField = useRef<HTMLSelectElement>(null)
 
   useEffect(() => {
@@ -21,7 +34,12 @@ export function RegistrationDialog({ services, doctors, whatsapp }: { services: 
       const d = (e as CustomEvent<{ staff?: string; service?: string }>).detail || {}
       lastFocus.current = document.activeElement as HTMLElement
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Makassar' }).format(new Date())
-      setForm((f) => ({ ...f, staff: d.staff ?? f.staff, service: d.service ?? (d.staff ? 'Poli Umum' : f.service), date: f.date || today }))
+      const picked = d.staff ? doctorsRef.current.find((x) => x.name === d.staff) : undefined
+      setForm((f) => {
+        const service = d.service ?? (picked ? serviceFor(picked.category, services) ?? f.service : f.service)
+        const staff = d.staff ?? (doctorsFor(service, doctorsRef.current).some((x) => x.name === f.staff) ? f.staff : '')
+        return { ...f, staff, service, date: f.date || today }
+      })
       setError('')
       setOpen(true)
     }
@@ -56,11 +74,21 @@ export function RegistrationDialog({ services, doctors, whatsapp }: { services: 
   }
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }))
+    setForm((f) => {
+      const next = { ...f, [k]: e.target.value }
+      // Ganti layanan → kosongkan dokter yang tidak melayani layanan tsb.
+      if (k === 'service' && !doctorsFor(next.service, doctors).some((x) => x.name === next.staff)) next.staff = ''
+      return next
+    })
+  const doctorOptions = doctorsFor(form.service, doctors)
 
   const selectedDay = form.date ? new Date(`${form.date}T12:00:00`).getDay() : null
   const doc = doctors.find((d) => d.name === form.staff)
   const slot = doc && selectedDay !== null ? doc.schedule.find((r) => Number(r.day) === selectedDay) : undefined
+  // Tanpa dokter dipilih: beri tahu bila tidak ada dokter poli tsb. pada tanggal itu (mis. Rabu).
+  const needsDoctor = /umum|gigi/i.test(form.service)
+  const anyDoctorThatDay =
+    selectedDay === null || doctorOptions.some((d) => d.schedule.some((r) => Number(r.day) === selectedDay))
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -105,7 +133,7 @@ export function RegistrationDialog({ services, doctors, whatsapp }: { services: 
               <label htmlFor="reg-staff">Dokter (opsional)</label>
               <select id="reg-staff" value={form.staff} onChange={set('staff')}>
                 <option value="">Siapa saja yang bertugas</option>
-                {doctors.map((d) => (
+                {doctorOptions.map((d) => (
                   <option key={d.id}>{d.name}</option>
                 ))}
               </select>
@@ -113,6 +141,12 @@ export function RegistrationDialog({ services, doctors, whatsapp }: { services: 
             <div className="field">
               <label htmlFor="reg-date">Tanggal kunjungan</label>
               <input id="reg-date" type="date" value={form.date} onChange={set('date')} required />
+              {!doc && needsDoctor && selectedDay !== null && !anyDoctorThatDay && (
+                <span className="hint" style={{ color: 'var(--accent-text)' }}>
+                  Tidak ada {isDental(form.service) ? 'dokter gigi' : 'dokter umum'} yang praktik hari {DAY_NAMES[selectedDay]}. Pilih
+                  tanggal lain atau tanyakan lewat WhatsApp.
+                </span>
+              )}
               {doc && selectedDay !== null && (
                 <span className="hint" style={{ color: slot ? 'var(--ok)' : 'var(--accent-text)' }}>
                   {slot
