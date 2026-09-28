@@ -28,7 +28,8 @@ if (databaseUrl.startsWith('file:')) {
 }
 
 export default buildConfig({
-  serverURL: process.env.NEXT_PUBLIC_SITE_URL || undefined,
+  // serverURL sengaja tidak diisi: URL media menjadi relatif sehingga tetap berfungsi
+  // di domain www/non-www maupun saat pratinjau di port lain.
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
@@ -36,7 +37,9 @@ export default buildConfig({
       titleSuffix: ' · Admin Klinik Mustika Sekar Taji',
       icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/icon.svg' }],
     },
-    dateFormat: 'd MMM yyyy, HH:mm',
+    dateFormat: 'd MMM yyyy, HH.mm',
+    // Avatar bawaan: tidak mengirim email pengguna ke layanan Gravatar.
+    avatar: 'default',
     components: {
       graphics: {
         Logo: '/components/admin/AdminLogo',
@@ -47,7 +50,7 @@ export default buildConfig({
   i18n: { supportedLanguages: { id }, fallbackLanguage: 'id' },
   collections: [Posts, Staff, Services, Gallery, Testimonials, Partners, Faqs, Media, Users],
   globals: [SiteSettings],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({ admin: { placeholder: 'Tulis isi di sini. Ketik / untuk menambah judul, daftar, gambar, atau kutipan.' } }),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: sqliteAdapter({

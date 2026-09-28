@@ -68,7 +68,7 @@ export default async function PostPage({ params }: Args) {
           <article>
             {cover?.url && (
               <img
-                src={imgUrl(cover, 'large') ?? cover.url}
+                src={imgUrl(cover, 'large') ?? imgUrl(cover) ?? ''}
                 alt={cover.alt}
                 width={cover.width ?? undefined}
                 height={cover.height ?? undefined}

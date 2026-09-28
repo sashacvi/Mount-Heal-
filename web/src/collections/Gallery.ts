@@ -23,7 +23,7 @@ export const Gallery: CollectionConfig = {
     { name: 'image', label: 'Foto', type: 'upload', relationTo: 'media', required: true },
     { name: 'caption', label: 'Keterangan', type: 'text', required: true, maxLength: 90 },
     { name: 'album', label: 'Album', type: 'select', required: true, defaultValue: 'fasilitas', options: [...ALBUMS] },
-    { name: 'takenAt', label: 'Tanggal foto', type: 'date', admin: { position: 'sidebar' } },
+    { name: 'takenAt', label: 'Tanggal foto', type: 'date', admin: { position: 'sidebar', date: { displayFormat: 'd MMM yyyy' } } },
     showField(),
     orderField,
   ],

@@ -47,7 +47,7 @@ export const Posts: CollectionConfig = {
       type: 'date',
       required: true,
       defaultValue: () => new Date().toISOString(),
-      admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
+      admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime', displayFormat: 'd MMM yyyy, HH.mm' } },
     },
     {
       name: 'author',
@@ -87,6 +87,7 @@ export const Posts: CollectionConfig = {
       type: 'date',
       admin: {
         position: 'sidebar',
+        date: { displayFormat: 'd MMM yyyy' },
         condition: (data) => data?.type === 'pengumuman' && Boolean(data?.pinned),
         description: 'Kosongkan bila tidak ada batas waktu.',
       },

@@ -103,7 +103,7 @@ export const Testimonials: CollectionConfig = {
       admin: { position: 'sidebar', condition: (d) => d?.source === 'langsung' },
     },
     { name: 'service', label: 'Layanan yang digunakan', type: 'text', admin: { position: 'sidebar' } },
-    { name: 'reviewDate', label: 'Tanggal ulasan', type: 'date', admin: { position: 'sidebar' } },
+    { name: 'reviewDate', label: 'Tanggal ulasan', type: 'date', admin: { position: 'sidebar', date: { displayFormat: 'd MMM yyyy' } } },
     {
       name: 'show',
       label: 'Tampilkan di situs',

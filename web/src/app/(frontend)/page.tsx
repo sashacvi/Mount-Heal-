@@ -353,7 +353,7 @@ export default async function HomePage() {
                   shot: src
                     ? {
                         src,
-                        full: shot?.url ?? src,
+                        full: imgUrl(shot) ?? src,
                         alt: shot?.alt || `Screenshot ulasan Google dari ${t.authorName}`,
                         width: shot?.sizes?.review?.width ?? shot?.width,
                         height: shot?.sizes?.review?.height ?? shot?.height,
@@ -396,8 +396,8 @@ export default async function HomePage() {
                   const dup = i >= partners.length
                   const inner = (
                     <>
-                      {logo?.url ? (
-                        <img src={logo.url} alt="" />
+                      {imgUrl(logo) ? (
+                        <img src={imgUrl(logo)!} alt="" />
                       ) : (
                         <span className="mono-mark" style={{ background: PARTNER_COLORS[i % PARTNER_COLORS.length] }}>
                           {abbr(p.name)}

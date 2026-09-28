@@ -81,8 +81,12 @@ export const getHomeData = cache(async () => {
 })
 
 export const media = (m: unknown): Media | null => (m && typeof m === 'object' ? (m as Media) : null)
+/** Payload menulis URL absolut memakai serverURL; ubah ke path relatif agar gambar tetap
+ * tampil walau situs diakses lewat domain lain (www/non-www, IP, port pratinjau). */
+const relative = (u?: string | null) => (u ? u.replace(/^https?:\/\/[^/]+/i, '') : null)
+
 export const imgUrl = (m: Media | null, size?: keyof NonNullable<Media['sizes']>) =>
-  (size && m?.sizes?.[size]?.url) || m?.url || null
+  relative((size && m?.sizes?.[size]?.url) || m?.url)
 
 /** Pengumuman yang disematkan dan belum kedaluwarsa. */
 export const activeAnnouncements = (posts: Post[]) => {
