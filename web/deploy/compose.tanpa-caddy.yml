@@ -1,8 +1,11 @@
-# Dipakai bila VPS sudah punya Nginx/Apache di port 80/443:
-#   docker compose -f docker-compose.yml -f deploy/compose.tanpa-caddy.yml up -d --no-build web
+# Dipakai bila VPS sudah punya Nginx/Apache di port 80/443. Aktifkan sekali lewat .env:
+#   COMPOSE_FILE=docker-compose.yml:deploy/compose.tanpa-caddy.yml
+# lalu cukup `docker compose up -d --no-build` (Caddy tidak ikut jalan).
 # Website tersedia di 127.0.0.1:3010 (ubah lewat WEB_HOST_PORT di .env) untuk di-proxy oleh Nginx
 # (contoh: deploy/nginx-klinik.conf). Port 3010 dipilih agar tidak bentrok dengan aplikasi lain di 3000.
 services:
   web:
     ports:
       - '127.0.0.1:${WEB_HOST_PORT:-3010}:3000'
+  caddy:
+    profiles: ['caddy']

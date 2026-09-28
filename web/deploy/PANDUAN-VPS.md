@@ -110,16 +110,31 @@ sudo docker compose up -d --no-build
 
 ### Jalur B (Nginx yang sudah ada)
 
+Aktifkan mode tanpa Caddy sekali saja, lalu jalankan website di `127.0.0.1:3010`:
+
 ```bash
-sudo docker compose -f docker-compose.yml -f deploy/compose.tanpa-caddy.yml up -d --no-build web
+echo 'COMPOSE_FILE=docker-compose.yml:deploy/compose.tanpa-caddy.yml' >> .env
+sudo docker compose up -d --no-build
+curl -sI http://127.0.0.1:3010 | head -1          # tunggu ±30 detik; harus HTTP/1.1 200
+```
+
+Tambahkan situs ke Nginx:
+
+```bash
 sudo cp deploy/nginx-klinik.conf /etc/nginx/sites-available/klinik-mst
 sudo ln -s /etc/nginx/sites-available/klinik-mst /etc/nginx/sites-enabled/klinik-mst
 sudo nginx -t && sudo systemctl reload nginx
-sudo apt-get install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d bintangusadabakti.com -d www.bintangusadabakti.com
+curl -sI -H 'Host: bintangusadabakti.com' http://127.0.0.1 | head -1   # harus HTTP/1.1 200
 ```
 
 `nginx -t` harus menampilkan `syntax is ok` sebelum reload. Bila gagal, hapus link tadi (`sudo rm /etc/nginx/sites-enabled/klinik-mst`) agar farmabit tidak terganggu, lalu kirim pesan error ke pengembang.
+
+Setelah DNS mengarah ke VPS (langkah 2) dan port 443 terbuka (langkah 3), pasang HTTPS:
+
+```bash
+sudo apt-get update && sudo apt-get install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d bintangusadabakti.com -d www.bintangusadabakti.com
+```
 
 ## Langkah 9 — Periksa
 
@@ -156,7 +171,7 @@ cd /opt/klinik-mst/repo && git pull
 cd web && sudo docker compose pull web && sudo docker compose up -d --no-build
 ```
 
-(Jalur B: tambahkan `-f docker-compose.yml -f deploy/compose.tanpa-caddy.yml` dan akhiri dengan `web`, seperti di langkah 8.)
+(Perintah yang sama berlaku untuk jalur A dan B; jalur B membaca `COMPOSE_FILE` dari `.env`.)
 
 ## Masalah umum
 

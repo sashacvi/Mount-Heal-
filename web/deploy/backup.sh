@@ -22,6 +22,9 @@ docker compose cp web:/app/media "$dest/media-$stamp"
 tar -czf "$dest/media-$stamp.tar.gz" -C "$dest" "media-$stamp"
 rm -rf "$dest/media-$stamp"
 
+# Konfigurasi (berisi PAYLOAD_SECRET) — tanpa file ini database lama tidak bisa dibuka dengan benar
+install -m 600 .env "$dest/env-terakhir"
+
 find "$dest" -name 'klinik-*.db' -mtime +"$keep_days" -delete
 find "$dest" -name 'media-*.tar.gz' -mtime +"$keep_days" -delete
 echo "Backup selesai: $dest/klinik-$stamp.db dan $dest/media-$stamp.tar.gz"
