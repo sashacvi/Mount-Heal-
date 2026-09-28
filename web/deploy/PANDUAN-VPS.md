@@ -158,14 +158,24 @@ Buka `https://bintangusadabakti.com/admin` → isi nama, email, kata sandi. Akun
 
 ## Langkah 11 — Backup otomatis
 
+Uji sekali (hasil di `/home/<user>/backup-klinik`, agar bisa diunduh tanpa akses root):
+
 ```bash
 cd /opt/klinik-mst/repo/web
-sudo bash deploy/backup.sh               # uji sekali; hasil di /root/backup-klinik
-sudo crontab -e                          # tambahkan baris di bawah, simpan
-30 2 * * * cd /opt/klinik-mst/repo/web && bash deploy/backup.sh >> /var/log/backup-klinik.log 2>&1
+sudo BACKUP_DIR=$HOME/backup-klinik bash deploy/backup.sh
+sudo chown -R $USER:$USER $HOME/backup-klinik
+ls -lh $HOME/backup-klinik
 ```
 
-Salin folder backup ke luar VPS secara berkala.
+Jadwalkan tiap malam 02.30 (menambah baris ke crontab root tanpa menghapus jadwal lain):
+
+```bash
+(sudo crontab -l 2>/dev/null; echo "30 2 * * * cd /opt/klinik-mst/repo/web && BACKUP_DIR=$HOME/backup-klinik bash deploy/backup.sh >> /var/log/backup-klinik.log 2>&1 && chown -R $USER:$USER $HOME/backup-klinik") | sudo crontab -
+sudo crontab -l
+```
+
+Salin ke luar VPS secara berkala, dari PowerShell di komputer: `scp -r <user>@<IP-VPS>:backup-klinik "$HOME\Documents\backup-klinik"`.
+File `env-terakhir` berisi `PAYLOAD_SECRET` — simpan di tempat aman.
 
 ---
 
