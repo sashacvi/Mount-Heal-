@@ -14,6 +14,7 @@
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/seed.ts",
+    "import:photos": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/import-photos.ts",
     "sync:google-reviews": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/sync-google-reviews.ts",
     "typecheck": "tsc --noEmit"
   },

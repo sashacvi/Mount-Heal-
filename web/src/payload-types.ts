@@ -295,7 +295,14 @@ export interface Staff {
   name: string;
   category: 'dokter' | 'dokter-gigi' | 'bidan' | 'perawat' | 'apoteker' | 'asisten-apoteker';
   position?: string | null;
+  /**
+   * Setelah mengunggah, klik ikon edit pada foto lalu letakkan titik fokus tepat di wajah.
+   */
   photo?: (number | null) | Media;
+  /**
+   * 1 = foto utuh. Naikkan (mis. 2,5) untuk foto seluruh badan agar wajah terlihat jelas di kartu.
+   */
+  photoZoom?: number | null;
   bio?: string | null;
   schedule?:
     | {
@@ -663,6 +670,7 @@ export interface StaffSelect<T extends boolean = true> {
   category?: T;
   position?: T;
   photo?: T;
+  photoZoom?: T;
   bio?: T;
   schedule?:
     | T

@@ -93,7 +93,10 @@ Migrasi database dijalankan otomatis saat server produksi mulai (`prodMigrations
 |---|---|
 | `npm run dev` | Server pengembangan |
 | `npm run build` / `npm start` | Build dan jalankan produksi |
-| `npm run seed` | Isi data awal (`-- --force` untuk mengisi ulang layanan, dokter, mitra, FAQ, kabar) |
+| `npm run seed` | Isi data awal (`FORCE=1 npm run seed` untuk mengisi ulang layanan, dokter, mitra, FAQ, kabar) |
+| `npm run import:photos` | Impor foto personel & galeri dari `seed-assets/` (`FORCE=1` untuk mengganti) |
+
+> `seed` dan `import:photos` menulis langsung ke database SQLite. Hentikan server terlebih dahulu agar file database tidak terkunci.
 | `npm run sync:google-reviews` | Tarik rating & ulasan Google |
 | `npm run generate:types` | Perbarui `src/payload-types.ts` setelah mengubah koleksi |
 | `npm run generate:importmap` | Perbarui import map admin setelah menambah komponen admin |

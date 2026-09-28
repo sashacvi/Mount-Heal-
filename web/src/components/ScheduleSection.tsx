@@ -2,19 +2,8 @@
 import { useEffect, useState } from 'react'
 import { DAY_NAMES, WEEK_ORDER, fmtRange, nowInClinic } from '@/lib/format'
 import { RegisterButton } from './RegisterButton'
+import { StaffPortrait } from './StaffPortrait'
 import type { StaffLite } from './types'
-
-const initials = (name: string) =>
-  name
-    .replace(/^(dr|drg|apt|Bd)\.\s*/i, '')
-    .split(/[ ,]/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
-
-const COLORS = ['#722975', '#0B7CC2', '#C21A74', '#082DF7']
 
 export function ScheduleSection({ doctors }: { doctors: StaffLite[] }) {
   const [day, setDay] = useState<number | null>(null)
@@ -46,13 +35,7 @@ export function ScheduleSection({ doctors }: { doctors: StaffLite[] }) {
         )}
         {list.map((d, i) => (
           <article className="doc" key={d.id}>
-            {d.photoUrl ? (
-              <img className="photo" src={d.photoUrl} alt={d.name} width={64} height={64} loading="lazy" />
-            ) : (
-              <span className="avatar" style={{ background: COLORS[i % COLORS.length] }} aria-hidden="true">
-                {initials(d.name)}
-              </span>
-            )}
+            <StaffPortrait name={d.name} photo={d.photo} variant="avatar" index={i} />
             <h3>{d.name}</h3>
             <span className="sp">{d.position || 'Dokter'}</span>
             <div className="slots">

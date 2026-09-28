@@ -13,6 +13,9 @@ export const Media: CollectionConfig = {
     staticDir: path.resolve(process.cwd(), 'media'),
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/svg+xml'],
     focalPoint: true,
+    // Foto asli diproses ulang: diputar sesuai orientasi kamera, sisi terpanjang maks. 2000 px,
+    // dan metadata EXIF (termasuk lokasi GPS dari ponsel) dibuang.
+    resizeOptions: { width: 2000, height: 2000, fit: 'inside', withoutEnlargement: true },
     adminThumbnail: 'thumb',
     imageSizes: [
       { name: 'thumb', width: 400, formatOptions: webp },

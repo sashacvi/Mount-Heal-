@@ -5,7 +5,7 @@ export type StaffLite = {
   name: string
   category: string
   position?: string | null
-  photoUrl?: string | null
+  photo?: import('@/lib/photo').StaffPhoto | null
   schedule: ScheduleRow[]
   scheduleNote?: string | null
 }

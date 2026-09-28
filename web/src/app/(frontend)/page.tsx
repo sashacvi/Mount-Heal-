@@ -7,6 +7,7 @@ import { LocationMap } from '@/components/LocationMap'
 import { NewsSection } from '@/components/NewsSection'
 import { RegisterButton } from '@/components/RegisterButton'
 import { ScheduleSection } from '@/components/ScheduleSection'
+import { StaffPortrait } from '@/components/StaffPortrait'
 import { TestimonialsCarousel } from '@/components/TestimonialsCarousel'
 import type { HoursRow } from '@/components/types'
 import { DAY_NAMES, WEEK_ORDER, fmtPhone, fmtRange, nowInClinic, waLink } from '@/lib/format'
@@ -20,6 +21,15 @@ function highlight(text: string): ReactNode[] {
 }
 
 const ALBUM_LABEL = { fasilitas: 'Fasilitas', tim: 'Tim', kegiatan: 'Kegiatan' } as const
+const STAFF_ORDER = ['dokter', 'dokter-gigi', 'bidan', 'perawat', 'apoteker', 'asisten-apoteker']
+const STAFF_LABEL = {
+  dokter: 'Dokter',
+  'dokter-gigi': 'Dokter Gigi',
+  bidan: 'Bidan',
+  perawat: 'Perawat',
+  apoteker: 'Apoteker',
+  'asisten-apoteker': 'Asisten Apoteker',
+} as const
 const PARTNER_COLORS = ['#722975', '#0B7CC2', '#C21A74', '#082DF7']
 const abbr = (name: string) =>
   name
@@ -36,8 +46,8 @@ export default async function HomePage() {
   const staffLite = staff.map(toStaffLite)
   const doctors = staffLite.filter((s) => s.category === 'dokter' || s.category === 'dokter-gigi')
   const midwives = staffLite.filter((s) => s.category === 'bidan')
-  const pharmacy = staffLite.filter((s) => s.category === 'apoteker' || s.category === 'asisten-apoteker')
-  const midwifeNote = midwives[0]?.scheduleNote ?? undefined
+  // Urutan kartu tim: kategori, lalu urutan tampil dari admin (sudah diurutkan query).
+  const teamOrdered = [...staffLite].sort((a, b) => STAFF_ORDER.indexOf(a.category) - STAFF_ORDER.indexOf(b.category))
   const team = settings.team ?? {}
   const today = nowInClinic().day
   const sameHours = hours.length === 7 && hours.every((h) => !h.closed && h.open === hours[0].open && h.close === hours[0].close)
@@ -208,43 +218,38 @@ export default async function HomePage() {
             </div>
           </div>
           <ScheduleSection doctors={doctors} />
-          <div className="doc-grid" id="tim" style={{ marginTop: 16 }}>
-            {midwives.length > 0 && (
-              <article className="team-card">
-                <span className="eyebrow">Bidan · KIA & KB</span>
-                <h3>Bidan jaga setiap hari</h3>
-                <ul>
-                  {midwives.map((m) => (
-                    <li key={m.id}>{m.name}</li>
-                  ))}
-                </ul>
-                {midwifeNote && <small style={{ color: 'var(--muted)' }}>{midwifeNote}</small>}
-              </article>
-            )}
-            {pharmacy.length > 0 && (
-              <article className="team-card">
-                <span className="eyebrow">Apotek / Farmasi</span>
-                <h3>Tim farmasi</h3>
-                <ul>
-                  {pharmacy.map((m) => (
-                    <li key={m.id}>
-                      {m.name}
-                      {m.position ? ` · ${m.position}` : ''}
-                    </li>
-                  ))}
-                </ul>
-                {team.pharmacyAssistants ? (
-                  <small style={{ color: 'var(--muted)' }}>Didukung {team.pharmacyAssistants} asisten apoteker.</small>
-                ) : null}
-              </article>
-            )}
-            {team.nurses ? (
-              <article className="team-card">
-                <span className="eyebrow">Keperawatan</span>
-                <h3>{team.nurses} perawat</h3>
-                <p style={{ color: 'var(--muted)', fontSize: 14.5 }}>Mendampingi dokter di poli, tindakan, dan layanan home care.</p>
-              </article>
-            ) : null}
+          <div className="team-head" id="tim">
+            <h3>Tim kesehatan kami</h3>
+            <p>
+              {[
+                team.nurses ? `${team.nurses} perawat` : null,
+                team.pharmacyAssistants ? `${team.pharmacyAssistants} asisten apoteker` : null,
+              ]
+                .filter(Boolean)
+                .join(' dan ') || null}
+              {team.nurses || team.pharmacyAssistants ? ' turut bertugas bergantian setiap hari.' : null}
+            </p>
+          </div>
+          <div className="team-grid">
+            {teamOrdered.map((m, i) => (
+              <figure className="team-member" key={m.id}>
+                <StaffPortrait name={m.name} photo={m.photo} variant="card" index={i} />
+                <figcaption>
+                  <b>{m.name}</b>
+                  <span className="role">{m.position || STAFF_LABEL[m.category as keyof typeof STAFF_LABEL]}</span>
+                  {m.category === 'bidan' || m.category === 'perawat' ? (
+                    m.scheduleNote ? <small>{m.scheduleNote}</small> : null
+                  ) : m.schedule.length > 0 ? (
+                    <small>
+                      Praktik{' '}
+                      {WEEK_ORDER.filter((w) => m.schedule.some((r) => Number(r.day) === w))
+                        .map((w) => DAY_NAMES[w].slice(0, 3))
+                        .join(', ')}
+                    </small>
+                  ) : null}
+                </figcaption>
+              </figure>
+            ))}
           </div>
         </div>
       </section>

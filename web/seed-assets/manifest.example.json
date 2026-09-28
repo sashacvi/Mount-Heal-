@@ -1,0 +1,20 @@
+{
+  "staff": [
+    {
+      "file": "ni-wayan-andriani.jpg",
+      "name": "Ni Wayan Andriani, A.Md.Kep",
+      "alt": "Ni Wayan Andriani, perawat Klinik Mustika Sekar Taji",
+      "focalX": 47.2,
+      "focalY": 40.9,
+      "zoom": 3.3
+    }
+  ],
+  "gallery": [
+    {
+      "file": "ruang-tindakan.jpg",
+      "caption": "Ruang tindakan",
+      "album": "fasilitas",
+      "alt": "Ruang tindakan dengan dua tempat tidur periksa dan troli alat"
+    }
+  ]
+}

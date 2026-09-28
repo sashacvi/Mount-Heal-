@@ -49,7 +49,34 @@ export const Staff: CollectionConfig = {
         },
       ],
     },
-    { name: 'photo', label: 'Foto', type: 'upload', relationTo: 'media' },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'photo',
+          label: 'Foto',
+          type: 'upload',
+          relationTo: 'media',
+          admin: {
+            width: '60%',
+            description: 'Setelah mengunggah, klik ikon edit pada foto lalu letakkan titik fokus tepat di wajah.',
+          },
+        },
+        {
+          name: 'photoZoom',
+          label: 'Perbesaran foto',
+          type: 'number',
+          defaultValue: 1.8,
+          min: 1,
+          max: 3.5,
+          admin: {
+            width: '40%',
+            step: 0.1,
+            description: '1 = foto utuh. Untuk foto seluruh badan pakai 3–3,5 agar wajah terlihat jelas di kartu.',
+          },
+        },
+      ],
+    },
     { name: 'bio', label: 'Profil singkat', type: 'textarea', maxLength: 400 },
     {
       name: 'schedule',

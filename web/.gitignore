@@ -11,3 +11,6 @@ npm-debug.log*
 next-env.d.ts
 /media
 /data
+/seed-assets/*
+!/seed-assets/README.md
+!/seed-assets/manifest.example.json

@@ -7,7 +7,11 @@ export const toStaffLite = (s: Staff): StaffLite => ({
   name: s.name,
   category: s.category,
   position: s.position,
-  photoUrl: imgUrl(media(s.photo), 'square'),
+  photo: (() => {
+    const m = media(s.photo)
+    const src = imgUrl(m, 'large')
+    return src ? { src, alt: m?.alt || s.name, fx: m?.focalX ?? 50, fy: m?.focalY ?? 30, zoom: s.photoZoom ?? 1.8 } : null
+  })(),
   schedule: (s.schedule ?? []).map((r) => ({ day: r.day, start: r.start, end: r.end })),
   scheduleNote: s.scheduleNote,
 })

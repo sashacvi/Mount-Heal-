@@ -1,7 +1,7 @@
 /**
  * Mengisi data awal Klinik Mustika Sekar Taji.
  * Jalankan: npm run seed            (lewati bila data sudah ada)
- *           npm run seed -- --force (hapus & isi ulang data contoh)
+ *           FORCE=1 npm run seed   (hapus & isi ulang data awal)
  */
 import config from '@payload-config'
 import { getPayload } from 'payload'
@@ -18,7 +18,8 @@ process.on('beforeExit', () => {
   }
 })
 
-const force = process.argv.includes('--force')
+// `payload run` tidak meneruskan argumen tambahan, jadi pakai variabel lingkungan FORCE=1.
+const force = process.env.FORCE === '1' || process.argv.includes('--force')
 const payload = await getPayload({ config })
 
 const rt = (paragraphs: string[]) => ({
@@ -48,7 +49,7 @@ const days = (list: readonly string[], start: string, end: string) =>
 console.log('[seed] terhubung ke database')
 const { totalDocs } = await payload.count({ collection: 'staff' })
 if (totalDocs > 0 && !force) {
-  payload.logger.info('Data sudah ada. Gunakan --force untuk mengisi ulang.')
+  payload.logger.info('Data sudah ada. Jalankan dengan FORCE=1 untuk mengisi ulang.')
   finished = true
   process.exit(0)
 }
@@ -67,7 +68,7 @@ await payload.updateGlobal({
     intro:
       'Poli umum, poli gigi, KIA & KB, laboratorium sederhana, apotek, medical check-up, dan home care. Melayani pasien umum dan BPJS Kesehatan setiap hari pukul 08.00–21.00 WITA.',
     about:
-      'Klinik Mustika Sekar Taji (sebelumnya bernama Bintang Usada Bhakti) berdiri pada 2024 dan melayani masyarakat Lembean, Kintamani, serta sekitarnya, baik pasien umum maupun peserta BPJS Kesehatan. Klinik telah terakreditasi Utama.\n\nPelayanan didukung 2 dokter umum, 1 dokter gigi, 4 bidan, 6 perawat, serta tim farmasi yang terdiri atas 1 apoteker dan 2 asisten apoteker.',
+      'Klinik Mustika Sekar Taji (sebelumnya bernama Bintang Usada Bhakti) berdiri pada 2024 dan melayani masyarakat Lembean, Kintamani, serta sekitarnya, baik pasien umum maupun peserta BPJS Kesehatan. Klinik telah terakreditasi Utama.\n\nPelayanan didukung 2 dokter umum, 1 dokter gigi, 5 bidan, 6 perawat, serta tim farmasi yang terdiri atas 1 apoteker dan 2 asisten apoteker.',
     foundedYear: 2024,
     accreditation: 'Utama',
     serviceModes: 'Umum dan BPJS',
@@ -80,7 +81,7 @@ await payload.updateGlobal({
     whatsapp: '087864114866',
     hours: everyDay.map((day) => ({ day, open: '08:00', close: '21:00', closed: false })),
     hoursNote: 'Jadwal dokter berbeda setiap hari; hari Rabu dokter libur. Bidan bertugas bergilir sepanjang jam operasional.',
-    team: { doctors: 2, dentists: 1, midwives: 4, nurses: 6, pharmacists: 1, pharmacyAssistants: 2 },
+    team: { doctors: 2, dentists: 1, midwives: 5, nurses: 6, pharmacists: 1, pharmacyAssistants: 2 },
     googleReviewsUrl: 'https://maps.app.goo.gl/LAKbhRadhn4KddM16',
   },
 })
@@ -108,13 +109,27 @@ const staff = [
   { name: 'dr. Enjik Ardhi Pradivtha', category: 'dokter', position: 'Dokter Umum', schedule: days(['1', '2', '4', '5', '6', '0'], '08:00', '14:00') },
   { name: 'dr. Ni Wayan Gunasri, M.Kes', category: 'dokter', position: 'Dokter Umum', schedule: days(['6', '0'], '17:00', '21:00') },
   { name: 'drg. I Made Yana Priyatna', category: 'dokter-gigi', position: 'Dokter Gigi', schedule: days(['5'], '09:00', '17:00') },
-  ...['Ni Kadek Candra Dewi', 'Ni Wayan Kariasih', 'Ni Komang Riantini Kusuma Wiartiani', 'Ni Putu Ayu Rika Maharani'].map((name) => ({
+  // PERLU DIKONFIRMASI: Ni Wayan Eka Nuriani, A.Md.Keb dikirim bersama foto (28 Sep 2026), tidak ada di daftar awal.
+  ...[
+    'Ni Kadek Candra Dewi',
+    'Ni Wayan Kariasih',
+    'Ni Komang Riantini Kusuma Wiartiani',
+    'Ni Putu Ayu Rika Maharani',
+    'Ni Wayan Eka Nuriani, A.Md.Keb',
+  ].map((name) => ({
     name,
     category: 'bidan' as const,
     position: 'Bidan',
     schedule: days(everyDay, '08:00', '21:00'),
     scheduleNote: 'Setiap hari 08.00–21.00 WITA, bergilir sesuai shift.',
   })),
+  {
+    name: 'Ni Wayan Andriani, A.Md.Kep',
+    category: 'perawat' as const,
+    position: 'Perawat',
+    schedule: [],
+    scheduleNote: 'Bertugas bergilir sesuai shift.',
+  },
   { name: 'apt. Ria Yuliana', category: 'apoteker', position: 'Apoteker', schedule: [] },
 ] as const
 const created: Record<string, number> = {}
