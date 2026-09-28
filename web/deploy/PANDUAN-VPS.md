@@ -49,7 +49,10 @@ getent hosts bintangusadabakti.com www.bintangusadabakti.com
 
 ## Langkah 3 — Buka port 80 dan 443
 
-Panel Biznet Gio → **Security Group / Firewall** VPS → izinkan **TCP 80** dan **TCP 443** dari `0.0.0.0/0` (lewati bila sudah terbuka untuk farmabit).
+Panel Biznet Gio → VPS → tab **Network and Security** → lihat bagian **Security Group**.
+
+- **Kosong** (tidak ada Security Group): semua port sudah terbuka. **Jangan membuat atau memasang Security Group baru** — Security Group baru berisi aturan `Any DROP`, sehingga SSH (22) dan situs lain di port 80 langsung terblokir.
+- **Ada Security Group terpasang**: tambahkan aturan `TCP 443 ACCEPT 0.0.0.0/0` (dan `TCP 80` bila belum ada) di Security Group **itu**.
 Bila `sudo ufw status` menunjukkan `active`: `sudo ufw allow 80/tcp && sudo ufw allow 443/tcp`.
 
 ## Langkah 4 — Pasang Docker (lewati bila `docker --version` di langkah 1 sudah muncul)
