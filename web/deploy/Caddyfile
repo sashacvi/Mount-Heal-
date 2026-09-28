@@ -1,0 +1,21 @@
+# Domain utama: HTTPS otomatis, kompresi, dan header keamanan dasar.
+{$SITE_DOMAIN} {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+	reverse_proxy web:3000
+}
+
+# www → tanpa www
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
+
+# Setelah ganti domain: arahkan domain lama ke domain baru (hapus tanda # lalu isi).
+# bintangusadabakti.com, www.bintangusadabakti.com {
+# 	redir https://{$SITE_DOMAIN}{uri} permanent
+# }

@@ -64,46 +64,80 @@ Google mengembalikan maksimal 5 ulasan per permintaan. Ulasan baru masuk dengan 
 
 ## Deploy
 
-### Hostinger (Node.js Web Apps, plan Business atau Cloud)
+### VPS (Biznet Gio atau VPS Ubuntu/Debian lain) — disarankan
 
-Hostinger menjalankan aplikasi Next.js dengan Node.js 18–24, dari GitHub atau upload .zip. **Setiap deploy ulang menimpa folder aplikasi**, jadi database dan foto unggahan wajib disimpan di folder lain di akun hosting (lihat `DATABASE_URL` dan `MEDIA_DIR` di bawah).
+Website + [Caddy](https://caddyserver.com) (HTTPS gratis otomatis dari Let's Encrypt) berjalan di Docker. Domain tetap di Hostinger; cukup arahkan DNS-nya ke IP VPS.
 
-1. **hPanel → Websites → Add Website → Node.js Apps.**
-2. Pilih sumber:
-   - **Import Git Repository**: hubungkan repositori ini. Bila ada isian *Root directory*, isi `web`.
-   - **Upload files**: unggah .zip berisi isi folder `web/` (buat dengan `git archive --format=zip -o klinik-web.zip HEAD:web` dari root repositori).
-3. Pengaturan build:
-   - Node.js version: **22.x**
-   - Build command: `npm run build`
-   - Start command: `npm start`
-4. **Environment variables** (hPanel → aplikasi → Environment variables):
+**1. Arahkan domain (hPanel Hostinger → Domains → bintangusadabakti.com → DNS / Nameservers → DNS records)**
 
-   | Nama | Isi |
-   |---|---|
-   | `PAYLOAD_SECRET` | 64 karakter acak, jangan dibagikan |
-   | `NEXT_PUBLIC_SITE_URL` | `https://bintangusadabakti.com` (ganti bila domain berubah, lalu deploy ulang) |
-   | `DATABASE_URL` | `file:/home/<USER_HOSTINGER>/klinik-data/klinik.db` |
-   | `MEDIA_DIR` | `/home/<USER_HOSTINGER>/klinik-data/media` |
+| Tipe | Nama | Isi | TTL |
+|---|---|---|---|
+| A | `@` | IP publik VPS | 3600 |
+| A | `www` | IP publik VPS | 3600 |
 
-   `<USER_HOSTINGER>` adalah nama pengguna akun (mis. `u123456789`), terlihat di hPanel → Advanced → SSH Access atau di path File Manager.
-5. Deploy. Saat pertama berjalan, aplikasi otomatis membuat tabel database dan **mengisi data awal klinik** (bila database kosong). Tidak perlu terminal.
-6. Buka `https://domain/admin`, buat akun admin pertama, lalu unggah foto personel & galeri dari panel admin.
-7. Cadangkan folder `klinik-data/` secara berkala (hPanel → Files → Backups, atau unduh lewat File Manager).
+Hapus record A/AAAA lain untuk `@` dan `www` yang mengarah ke tempat lain (termasuk AAAA bila VPS tidak memakai IPv6; ini membuat sertifikat HTTPS gagal). Perubahan DNS bisa butuh beberapa menit sampai beberapa jam. Cek dengan `dig +short bintangusadabakti.com` sampai muncul IP VPS.
 
-> Bila Hostinger ternyata tidak mengizinkan aplikasi menulis di luar folder aplikasi, alternatifnya: database di **Turso** (`DATABASE_URL=libsql://…` + `DATABASE_AUTH_TOKEN`, ada paket gratis) dan foto di penyimpanan objek. Beri tahu pengembang sebelum mengubahnya.
+**2. Siapkan VPS (sekali saja)**
 
-**Ganti domain nanti:** tambahkan domain baru di hPanel, ubah `NEXT_PUBLIC_SITE_URL`, deploy ulang, lalu arahkan domain lama ke domain baru dengan redirect 301 agar peringkat Google dan tautan lama tetap berfungsi.
-
-### VPS / server sendiri
+Masuk SSH ke VPS, salin kode website (salah satu):
+- `git clone <url-repositori>` lalu `cd <repo>/web`, atau
+- unggah `klinik-web.zip` (dibuat dengan `git archive --format=zip -o klinik-web.zip HEAD:web`) lalu `unzip klinik-web.zip -d klinik-web && cd klinik-web`.
 
 ```bash
-cp .env.example .env    # isi PAYLOAD_SECRET dan NEXT_PUBLIC_SITE_URL=https://domain-klinik
-docker compose up -d --build
+sudo bash deploy/setup-vps.sh     # pasang Docker, swap 2 GB bila RAM < 4 GB, buka port 80/443 bila ufw aktif
+```
+Pastikan juga port **80 dan 443** terbuka di firewall/security group panel Biznet Gio.
+
+**3. Isi konfigurasi**
+
+```bash
+cp .env.example .env
+nano .env
+```
+Isi minimal:
+```
+PAYLOAD_SECRET=<64 karakter acak>
+NEXT_PUBLIC_SITE_URL=https://bintangusadabakti.com
+SITE_DOMAIN=bintangusadabakti.com
 ```
 
-Data awal terisi otomatis saat pertama berjalan. Database (`/app/data`) dan foto (`/app/media`) disimpan di volume Docker. Pasang reverse proxy (Caddy/Nginx) untuk HTTPS. Cadangkan kedua volume secara berkala.
+**4. Jalankan**
 
-Tanpa Docker: `npm ci && npm run build && npm start` di server Node.js 20+, dengan folder `data/` dan `media/` yang persisten.
+```bash
+sudo docker compose up -d --build      # build pertama ±3–6 menit
+sudo docker compose logs -f web        # tunggu "Database kosong: mengisi data awal klinik…" lalu Ctrl+C
+```
+Buka `https://bintangusadabakti.com/admin` dan buat akun admin pertama (otomatis menjadi Admin).
+
+**5. Backup otomatis**
+
+```bash
+bash deploy/backup.sh                  # uji sekali; hasil di ~/backup-klinik
+crontab -e                             # tambahkan baris berikut (setiap 02.30)
+30 2 * * * cd /path/ke/klinik-web && bash deploy/backup.sh >> backup.log 2>&1
+```
+Salin folder `~/backup-klinik` ke tempat lain (Google Drive/komputer) secara berkala. Backup disimpan 30 hari.
+
+**Update versi website:** salin kode terbaru (git pull atau zip baru), lalu `sudo docker compose up -d --build`. Database dan foto ada di volume Docker sehingga tidak ikut terhapus.
+
+**Ganti domain nanti:** arahkan DNS domain baru ke IP VPS, ubah `SITE_DOMAIN` dan `NEXT_PUBLIC_SITE_URL` di `.env`, aktifkan blok redirect domain lama di `deploy/Caddyfile`, lalu `sudo docker compose up -d --build`. Redirect 301 menjaga tautan lama dan peringkat Google.
+
+**VPS sudah memakai Nginx/Apache di port 80/443?** Jalankan tanpa Caddy: `sudo docker compose -f docker-compose.yml -f deploy/compose.tanpa-caddy.yml up -d --build web`, lalu pakai contoh `deploy/nginx-klinik.conf` dan `certbot --nginx`.
+
+**Impor foto dari `seed-assets/` (opsional, selain lewat panel admin):**
+```bash
+sudo docker compose stop web
+sudo docker compose run --rm -v "$PWD/seed-assets:/app/seed-assets:ro" web npm run import:photos
+sudo docker compose start web
+```
+
+### Hosting Node.js terkelola (Hostinger Business/Cloud, dll.)
+
+Juga didukung, tetapi tidak diperlukan bila sudah punya VPS. Karena folder aplikasi ditimpa setiap deploy, isi `DATABASE_URL` (mis. `file:/home/<user>/klinik-data/klinik.db`) dan `MEDIA_DIR` ke folder di luar folder aplikasi. Data awal terisi otomatis saat pertama berjalan.
+
+### Tanpa Docker
+
+`npm ci && npm run build && npm start` di server Node.js 22, dengan `DATABASE_URL` dan `MEDIA_DIR` menunjuk ke folder yang persisten, dijalankan oleh pengelola proses (systemd/pm2) di balik reverse proxy HTTPS.
 
 Migrasi database dijalankan otomatis saat server produksi mulai (`prodMigrations`). Setelah mengubah skema koleksi, buat migrasi baru dengan `npm run migrate:create -- nama-perubahan`, **periksa isinya**, lalu commit berkasnya.
 
@@ -113,7 +147,7 @@ Migrasi database dijalankan otomatis saat server produksi mulai (`prodMigrations
 
 ### Catatan
 
-- "Jadwalkan terbit" dijalankan oleh antrean internal setiap menit selama server hidup (Hostinger Node.js Apps, VPS, atau Docker).
+- "Jadwalkan terbit" dijalankan oleh antrean internal setiap menit selama server hidup.
 - `NEXT_PUBLIC_SITE_URL` dibaca saat build; build ulang bila domain berubah.
 
 ## Perintah

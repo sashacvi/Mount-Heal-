@@ -4,3 +4,6 @@ data
 media
 .env
 .env*.local
+seed-assets/*
+!seed-assets/README.md
+!seed-assets/manifest.example.json

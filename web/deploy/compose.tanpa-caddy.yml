@@ -1,0 +1,7 @@
+# Dipakai bila VPS sudah punya Nginx/Apache di port 80/443:
+#   docker compose -f docker-compose.yml -f deploy/compose.tanpa-caddy.yml up -d --build web
+# Website tersedia di 127.0.0.1:3000 untuk di-proxy oleh Nginx (contoh: deploy/nginx-klinik.conf).
+services:
+  web:
+    ports:
+      - '127.0.0.1:3000:3000'
