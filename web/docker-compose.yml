@@ -1,5 +1,6 @@
 # Website + Caddy (HTTPS otomatis dari Let's Encrypt).
-# Jalankan: docker compose up -d --build
+# Build di server ini      : docker compose up -d --build
+# Pakai image jadi (GHCR)  : isi WEB_IMAGE di .env, lalu docker compose pull web && docker compose up -d --no-build
 services:
   web:
     build:
@@ -7,7 +8,7 @@ services:
       args:
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?Isi NEXT_PUBLIC_SITE_URL di .env}
         NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY:-}
-    image: klinik-mst-web
+    image: ${WEB_IMAGE:-klinik-mst-web}
     env_file: .env
     environment:
       DATABASE_URL: file:/app/data/klinik.db
@@ -17,6 +18,9 @@ services:
       - klinik-media:/app/media
     expose:
       - '3000'
+    # Batas sumber daya agar tidak mengganggu aplikasi lain di VPS yang sama (pemakaian normal ±300 MB).
+    mem_limit: ${WEB_MEM_LIMIT:-1g}
+    cpus: ${WEB_CPUS:-1.5}
     restart: unless-stopped
 
   caddy:
@@ -33,6 +37,7 @@ services:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+    mem_limit: 256m
     restart: unless-stopped
 
 volumes:

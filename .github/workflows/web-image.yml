@@ -1,0 +1,53 @@
+# Membuat image Docker website di GitHub (bukan di VPS) lalu mengirimnya ke GitHub Container Registry.
+# VPS cukup menjalankan: docker compose pull web && docker compose up -d --no-build
+name: Build image website
+
+on:
+  push:
+    branches: [main, claude/clinic-company-profile-design-2lxjjf]
+    paths: ['web/**', '.github/workflows/web-image.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: web-image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/klinik-mst-web
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=ref,event=branch
+            type=sha,prefix=sha-
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: web
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Domain publik ikut ditanam saat build. Ubah lewat Settings → Secrets and variables → Actions → Variables → SITE_URL.
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=${{ vars.SITE_URL || 'https://bintangusadabakti.com' }}
+            NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY=${{ vars.GOOGLE_MAPS_EMBED_KEY || '' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

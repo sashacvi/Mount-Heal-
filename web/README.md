@@ -68,6 +68,38 @@ Google mengembalikan maksimal 5 ulasan per permintaan. Ulasan baru masuk dengan 
 
 Website + [Caddy](https://caddyserver.com) (HTTPS gratis otomatis dari Let's Encrypt) berjalan di Docker. Domain tetap di Hostinger; cukup arahkan DNS-nya ke IP VPS.
 
+**Kebutuhan sumber daya (diukur):** website berjalan ±160–300 MB RAM (dibatasi maksimal 1 GB), Caddy ±20 MB, image ±1,7 GB di disk. **Build** image butuh ±2,2 GB RAM selama ±1 menit, jadi di VPS yang sudah menjalankan aplikasi lain sebaiknya image dibuat oleh GitHub Actions (lihat di bawah) dan VPS hanya mengunduhnya.
+
+#### VPS yang sudah menjalankan aplikasi lain
+
+Cek dulu (kirim hasilnya ke pengembang bila ragu):
+```bash
+free -h; df -h /; docker ps --format '{{.Names}}\t{{.Ports}}' 2>/dev/null
+sudo ss -tlnp | grep -E ':(80|443|3000) '
+ls /etc/nginx/sites-enabled 2>/dev/null; systemctl is-active nginx apache2 2>/dev/null
+```
+
+| Hasil | Cara memasang website |
+|---|---|
+| Port 80/443 **kosong** | Pakai langkah standar di bawah (Caddy). |
+| Port 80/443 dipakai **Nginx di host** | `docker compose -f docker-compose.yml -f deploy/compose.tanpa-caddy.yml up -d web`, salin `deploy/nginx-klinik.conf` ke `/etc/nginx/sites-available/`, aktifkan, `sudo nginx -t && sudo systemctl reload nginx`, lalu `sudo certbot --nginx -d bintangusadabakti.com -d www.bintangusadabakti.com`. Aplikasi lain tidak tersentuh. |
+| Port 80/443 dipakai **container lain** (mis. Nginx/Traefik dalam Docker) | Tambahkan domain ini ke proxy yang sudah ada, arahkan ke `127.0.0.1:3000` (pakai `deploy/compose.tanpa-caddy.yml`). |
+| Port 3000 sudah terpakai | Ubah `127.0.0.1:3000` di `deploy/compose.tanpa-caddy.yml` (dan di konfigurasi Nginx) ke port kosong, mis. `3010`. |
+
+Sebelum memasang, buat **snapshot VPS** di panel Biznet Gio agar bisa kembali bila ada masalah.
+
+#### Image jadi dari GitHub Actions (disarankan untuk VPS bersama)
+
+Setiap push ke folder `web/` menjalankan workflow `.github/workflows/web-image.yml` yang membuat image `ghcr.io/sashacvi/klinik-mst-web`. Di VPS:
+```bash
+# sekali: login ke GitHub Container Registry memakai Personal Access Token (classic) dengan izin read:packages
+echo <TOKEN> | sudo docker login ghcr.io -u <username-github> --password-stdin
+# di .env tambahkan:
+#   WEB_IMAGE=ghcr.io/sashacvi/klinik-mst-web:latest
+sudo docker compose pull web && sudo docker compose up -d --no-build
+```
+Update versi berikutnya cukup mengulang baris terakhir. Domain yang ditanam di image diatur lewat variabel repositori `SITE_URL` (Settings → Secrets and variables → Actions → Variables); tag `latest` dibuat dari branch `main`, tag nama-branch dari branch lain.
+
 **1. Arahkan domain (hPanel Hostinger → Domains → bintangusadabakti.com → DNS / Nameservers → DNS records)**
 
 | Tipe | Nama | Isi | TTL |
