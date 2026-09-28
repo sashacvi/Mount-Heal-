@@ -10,7 +10,8 @@ export const Media: CollectionConfig = {
   admin: { group: 'Konten', defaultColumns: ['filename', 'alt', 'updatedAt'] },
   access: { read: anyone, create: isLoggedIn, update: isLoggedIn, delete: canEdit },
   upload: {
-    staticDir: path.resolve(process.cwd(), 'media'),
+    // MEDIA_DIR: folder unggahan di luar folder aplikasi agar tidak terhapus saat deploy ulang.
+    staticDir: path.resolve(process.env.MEDIA_DIR || path.join(process.cwd(), 'media')),
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/svg+xml'],
     focalPoint: true,
     // Foto asli diproses ulang: diputar sesuai orientasi kamera, sisi terpanjang maks. 2000 px,

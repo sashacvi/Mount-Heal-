@@ -64,15 +64,44 @@ Google mengembalikan maksimal 5 ulasan per permintaan. Ulasan baru masuk dengan 
 
 ## Deploy
 
-### VPS / server sendiri (disarankan)
+### Hostinger (Node.js Web Apps, plan Business atau Cloud)
+
+Hostinger menjalankan aplikasi Next.js dengan Node.js 18–24, dari GitHub atau upload .zip. **Setiap deploy ulang menimpa folder aplikasi**, jadi database dan foto unggahan wajib disimpan di folder lain di akun hosting (lihat `DATABASE_URL` dan `MEDIA_DIR` di bawah).
+
+1. **hPanel → Websites → Add Website → Node.js Apps.**
+2. Pilih sumber:
+   - **Import Git Repository**: hubungkan repositori ini. Bila ada isian *Root directory*, isi `web`.
+   - **Upload files**: unggah .zip berisi isi folder `web/` (buat dengan `git archive --format=zip -o klinik-web.zip HEAD:web` dari root repositori).
+3. Pengaturan build:
+   - Node.js version: **22.x**
+   - Build command: `npm run build`
+   - Start command: `npm start`
+4. **Environment variables** (hPanel → aplikasi → Environment variables):
+
+   | Nama | Isi |
+   |---|---|
+   | `PAYLOAD_SECRET` | 64 karakter acak, jangan dibagikan |
+   | `NEXT_PUBLIC_SITE_URL` | `https://bintangusadabakti.com` (ganti bila domain berubah, lalu deploy ulang) |
+   | `DATABASE_URL` | `file:/home/<USER_HOSTINGER>/klinik-data/klinik.db` |
+   | `MEDIA_DIR` | `/home/<USER_HOSTINGER>/klinik-data/media` |
+
+   `<USER_HOSTINGER>` adalah nama pengguna akun (mis. `u123456789`), terlihat di hPanel → Advanced → SSH Access atau di path File Manager.
+5. Deploy. Saat pertama berjalan, aplikasi otomatis membuat tabel database dan **mengisi data awal klinik** (bila database kosong). Tidak perlu terminal.
+6. Buka `https://domain/admin`, buat akun admin pertama, lalu unggah foto personel & galeri dari panel admin.
+7. Cadangkan folder `klinik-data/` secara berkala (hPanel → Files → Backups, atau unduh lewat File Manager).
+
+> Bila Hostinger ternyata tidak mengizinkan aplikasi menulis di luar folder aplikasi, alternatifnya: database di **Turso** (`DATABASE_URL=libsql://…` + `DATABASE_AUTH_TOKEN`, ada paket gratis) dan foto di penyimpanan objek. Beri tahu pengembang sebelum mengubahnya.
+
+**Ganti domain nanti:** tambahkan domain baru di hPanel, ubah `NEXT_PUBLIC_SITE_URL`, deploy ulang, lalu arahkan domain lama ke domain baru dengan redirect 301 agar peringkat Google dan tautan lama tetap berfungsi.
+
+### VPS / server sendiri
 
 ```bash
 cp .env.example .env    # isi PAYLOAD_SECRET dan NEXT_PUBLIC_SITE_URL=https://domain-klinik
 docker compose up -d --build
-docker compose exec web npm run seed    # sekali saja, untuk data awal
 ```
 
-Database (`/app/data`) dan foto (`/app/media`) disimpan di volume Docker. Pasang reverse proxy (Caddy/Nginx) untuk HTTPS. Cadangkan kedua volume secara berkala.
+Data awal terisi otomatis saat pertama berjalan. Database (`/app/data`) dan foto (`/app/media`) disimpan di volume Docker. Pasang reverse proxy (Caddy/Nginx) untuk HTTPS. Cadangkan kedua volume secara berkala.
 
 Tanpa Docker: `npm ci && npm run build && npm start` di server Node.js 20+, dengan folder `data/` dan `media/` yang persisten.
 
@@ -84,7 +113,7 @@ Migrasi database dijalankan otomatis saat server produksi mulai (`prodMigrations
 
 ### Catatan
 
-- "Jadwalkan terbit" dijalankan oleh antrean internal setiap menit, sehingga butuh server yang selalu hidup (VPS/Docker).
+- "Jadwalkan terbit" dijalankan oleh antrean internal setiap menit selama server hidup (Hostinger Node.js Apps, VPS, atau Docker).
 - `NEXT_PUBLIC_SITE_URL` dibaca saat build; build ulang bila domain berubah.
 
 ## Perintah

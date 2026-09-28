@@ -18,6 +18,7 @@ import { Testimonials } from './collections/Testimonials'
 import { Users } from './collections/Users'
 import { SiteSettings } from './globals/SiteSettings'
 import { migrations } from './migrations'
+import { seedClinic } from './seed/clinic'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const databaseUrl = process.env.DATABASE_URL || 'file:./data/klinik.db'
@@ -61,6 +62,16 @@ export default buildConfig({
     prodMigrations: migrations,
   }),
   sharp,
+  // Hosting tanpa terminal (mis. Hostinger): isi data awal otomatis bila database masih kosong.
+  // Matikan dengan AUTO_SEED=0.
+  onInit: async (payload) => {
+    if (process.env.AUTO_SEED === '0') return
+    const { totalDocs } = await payload.count({ collection: 'staff', overrideAccess: true })
+    if (totalDocs === 0) {
+      payload.logger.info('Database kosong: mengisi data awal klinik…')
+      await seedClinic(payload)
+    }
+  },
   // Menjalankan antrean "jadwalkan terbit" setiap menit (butuh server yang selalu hidup).
   jobs: { autoRun: [{ cron: '* * * * *', queue: 'default', limit: 10 }] },
 })
