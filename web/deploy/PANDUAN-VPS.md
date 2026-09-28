@@ -1,0 +1,170 @@
+# Panduan pasang website di VPS Biznet Gio (berdampingan dengan farmabit)
+
+Waktu: ±30–45 menit (belum termasuk tunggu DNS). Semua perintah dijalankan lewat SSH di VPS.
+Baris yang diawali `#` adalah keterangan, tidak perlu diketik.
+
+---
+
+## Langkah 0 — Amankan dulu
+
+1. Panel Biznet Gio → VPS **farmabit** → **Snapshot** → buat snapshot baru (mis. `sebelum-website-klinik`).
+2. Siapkan: IP publik VPS, akses SSH, dan akun GitHub.
+
+## Langkah 1 — Cek kondisi VPS (hanya membaca, tidak mengubah apa pun)
+
+```bash
+free -h; df -h /
+docker --version; docker compose version
+sudo docker ps --format '{{.Names}}\t{{.Ports}}'
+sudo ss -tlnp | grep -E ':(80|443|3000) '
+ls /etc/nginx/sites-enabled 2>/dev/null; systemctl is-active nginx apache2 2>/dev/null
+```
+
+Tentukan jalur dari hasil `ss`:
+
+| Hasil `ss` untuk port 80/443 | Jalur |
+|---|---|
+| Tidak ada baris | **A — Caddy** (paling sederhana) |
+| Ada `nginx` (program di VPS, bukan Docker) | **B — Nginx yang sudah ada** |
+| Ada `docker-proxy` (proxy farmabit di Docker) | **C** — hubungi pengembang dengan hasil langkah 1 |
+
+Bila port **3000** sudah dipakai, ganti `3000` menjadi port kosong (mis. `3010`) di `deploy/compose.tanpa-caddy.yml` dan `deploy/nginx-klinik.conf` (jalur B).
+
+## Langkah 2 — Arahkan domain (hPanel Hostinger)
+
+hPanel → **Domains** → `bintangusadabakti.com` → **DNS / Nameservers** → **DNS records**:
+
+| Tipe | Nama | Isi (Points to) | TTL |
+|---|---|---|---|
+| A | `@` | IP publik VPS | 3600 |
+| A | `www` | IP publik VPS | 3600 |
+
+Hapus record **A**, **AAAA**, atau **CNAME** lain untuk `@` dan `www`. Cek dari VPS sampai muncul IP VPS (bisa beberapa menit sampai beberapa jam):
+
+```bash
+getent hosts bintangusadabakti.com www.bintangusadabakti.com
+```
+
+## Langkah 3 — Buka port 80 dan 443
+
+Panel Biznet Gio → **Security Group / Firewall** VPS → izinkan **TCP 80** dan **TCP 443** dari `0.0.0.0/0` (lewati bila sudah terbuka untuk farmabit).
+Bila `sudo ufw status` menunjukkan `active`: `sudo ufw allow 80/tcp && sudo ufw allow 443/tcp`.
+
+## Langkah 4 — Pasang Docker (lewati bila `docker --version` di langkah 1 sudah muncul)
+
+```bash
+curl -fsSL https://get.docker.com | sudo sh
+sudo systemctl enable --now docker
+```
+
+## Langkah 5 — Ambil file konfigurasi website
+
+```bash
+sudo mkdir -p /opt/klinik-mst && sudo chown $USER /opt/klinik-mst
+git clone --depth 1 -b claude/clinic-company-profile-design-2lxjjf https://github.com/sashacvi/Mount-Heal-.git /opt/klinik-mst/repo
+cd /opt/klinik-mst/repo/web
+```
+
+## Langkah 6 — Isi konfigurasi
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Ubah/isi baris berikut, lalu simpan (Ctrl+O, Enter, Ctrl+X):
+
+```
+PAYLOAD_SECRET=<isi 64 karakter acak dari pengembang, rahasiakan>
+NEXT_PUBLIC_SITE_URL=https://bintangusadabakti.com
+SITE_DOMAIN=bintangusadabakti.com
+WEB_IMAGE=ghcr.io/sashacvi/klinik-mst-web:claude-clinic-company-profile-design-2lxjjf
+```
+
+Tag di atas adalah image yang dibangun otomatis dari branch pengembangan. Setelah kode digabung ke branch `main`, ganti tag menjadi `latest`.
+
+## Langkah 7 — Unduh image website (tanpa build di VPS)
+
+Image saat ini berstatus **private**, jadi VPS belum bisa mengunduhnya. Pilih salah satu:
+
+- **Cara 1 (disarankan, sekali saja):** jadikan image publik. GitHub → foto profil → **Your profile** → tab **Packages** → `klinik-mst-web` → **Package settings** → **Danger Zone** → **Change visibility** → **Public**. Aman: image hanya berisi kode yang memang sudah publik di repo; rahasia (`PAYLOAD_SECRET`), database, dan foto disimpan di VPS, bukan di image.
+- **Cara 2 (tetap private):** buat Personal Access Token (GitHub → Settings → Developer settings → Personal access tokens → **Tokens (classic)** → centang hanya `read:packages`), lalu di VPS:
+
+  ```bash
+  echo <TOKEN> | sudo docker login ghcr.io -u sashacvi --password-stdin
+  ```
+
+Lalu:
+
+```bash
+sudo docker compose pull web
+```
+
+## Langkah 8 — Jalankan
+
+### Jalur A (Caddy, port 80/443 kosong)
+
+```bash
+sudo docker compose up -d --no-build
+```
+
+### Jalur B (Nginx yang sudah ada)
+
+```bash
+sudo docker compose -f docker-compose.yml -f deploy/compose.tanpa-caddy.yml up -d --no-build web
+sudo cp deploy/nginx-klinik.conf /etc/nginx/sites-available/klinik-mst
+sudo ln -s /etc/nginx/sites-available/klinik-mst /etc/nginx/sites-enabled/klinik-mst
+sudo nginx -t && sudo systemctl reload nginx
+sudo apt-get install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d bintangusadabakti.com -d www.bintangusadabakti.com
+```
+
+`nginx -t` harus menampilkan `syntax is ok` sebelum reload. Bila gagal, hapus link tadi (`sudo rm /etc/nginx/sites-enabled/klinik-mst`) agar farmabit tidak terganggu, lalu kirim pesan error ke pengembang.
+
+## Langkah 9 — Periksa
+
+```bash
+sudo docker compose ps                    # web: Up (healthy)
+sudo docker compose logs --tail=30 web    # ada "Database kosong: mengisi data awal klinik…" saat pertama kali
+curl -I https://bintangusadabakti.com     # HTTP/2 200
+free -h                                   # pastikan farmabit masih punya memori cukup
+```
+
+Pastikan juga farmabit masih bisa dibuka seperti biasa.
+
+## Langkah 10 — Buat akun admin
+
+Buka `https://bintangusadabakti.com/admin` → isi nama, email, kata sandi. Akun pertama otomatis menjadi **Admin**. Setelah itu unggah foto personel lewat **Klinik → Dokter & Tenaga Kesehatan**.
+
+## Langkah 11 — Backup otomatis
+
+```bash
+cd /opt/klinik-mst/repo/web
+sudo bash deploy/backup.sh               # uji sekali; hasil di /root/backup-klinik
+sudo crontab -e                          # tambahkan baris di bawah, simpan
+30 2 * * * cd /opt/klinik-mst/repo/web && bash deploy/backup.sh >> /var/log/backup-klinik.log 2>&1
+```
+
+Salin folder backup ke luar VPS secara berkala.
+
+---
+
+## Update website di kemudian hari
+
+```bash
+cd /opt/klinik-mst/repo && git pull
+cd web && sudo docker compose pull web && sudo docker compose up -d --no-build
+```
+
+(Jalur B: tambahkan `-f docker-compose.yml -f deploy/compose.tanpa-caddy.yml` dan akhiri dengan `web`, seperti di langkah 8.)
+
+## Masalah umum
+
+| Gejala | Penyebab & solusi |
+|---|---|
+| `pull` gagal `unauthorized` / `denied` | Belum login GHCR atau token tanpa `read:packages` (langkah 7). |
+| `port is already allocated` / `address already in use` | Port 80/443/3000 dipakai aplikasi lain → pakai jalur B atau ganti port. |
+| Caddy log `challenge failed` / sertifikat gagal | DNS belum mengarah ke VPS, ada record AAAA lama, atau port 80 tertutup (langkah 2–3). |
+| Halaman 502 Bad Gateway | Website belum selesai menyala; tunggu 30–60 detik lalu cek `docker compose logs web`. |
+| Ingin menghentikan website | `sudo docker compose down` (data tetap tersimpan di volume). |
+| Ingin menghapus total | `sudo docker compose down -v` (**menghapus database & foto**; lakukan backup dulu). |
