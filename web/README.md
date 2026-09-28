@@ -83,8 +83,8 @@ ls /etc/nginx/sites-enabled 2>/dev/null; systemctl is-active nginx apache2 2>/de
 |---|---|
 | Port 80/443 **kosong** | Pakai langkah standar di bawah (Caddy). |
 | Port 80/443 dipakai **Nginx di host** | `docker compose -f docker-compose.yml -f deploy/compose.tanpa-caddy.yml up -d web`, salin `deploy/nginx-klinik.conf` ke `/etc/nginx/sites-available/`, aktifkan, `sudo nginx -t && sudo systemctl reload nginx`, lalu `sudo certbot --nginx -d bintangusadabakti.com -d www.bintangusadabakti.com`. Aplikasi lain tidak tersentuh. |
-| Port 80/443 dipakai **container lain** (mis. Nginx/Traefik dalam Docker) | Tambahkan domain ini ke proxy yang sudah ada, arahkan ke `127.0.0.1:3000` (pakai `deploy/compose.tanpa-caddy.yml`). |
-| Port 3000 sudah terpakai | Ubah `127.0.0.1:3000` di `deploy/compose.tanpa-caddy.yml` (dan di konfigurasi Nginx) ke port kosong, mis. `3010`. |
+| Port 80/443 dipakai **container lain** (mis. Nginx/Traefik dalam Docker) | Tambahkan domain ini ke proxy yang sudah ada, arahkan ke `127.0.0.1:3010` (pakai `deploy/compose.tanpa-caddy.yml`). |
+| Port 3010 sudah terpakai | Isi `WEB_HOST_PORT` di `.env` dengan port kosong lain dan samakan `proxy_pass` di `deploy/nginx-klinik.conf`. |
 
 Sebelum memasang, buat **snapshot VPS** di panel Biznet Gio agar bisa kembali bila ada masalah.
 

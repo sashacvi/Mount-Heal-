@@ -28,7 +28,7 @@ Tentukan jalur dari hasil `ss`:
 | Ada `nginx` (program di VPS, bukan Docker) | **B — Nginx yang sudah ada** |
 | Ada `docker-proxy` (proxy farmabit di Docker) | **C** — hubungi pengembang dengan hasil langkah 1 |
 
-Bila port **3000** sudah dipakai, ganti `3000` menjadi port kosong (mis. `3010`) di `deploy/compose.tanpa-caddy.yml` dan `deploy/nginx-klinik.conf` (jalur B).
+Jalur B memakai port lokal **3010** (bukan 3000) agar tidak bentrok dengan aplikasi lain. Pastikan `sudo ss -tlnp | grep ':3010 '` kosong; bila terpakai, isi `WEB_HOST_PORT` di `.env` dengan port lain dan samakan di `deploy/nginx-klinik.conf`.
 
 ## Langkah 2 — Arahkan domain (hPanel Hostinger)
 
