@@ -188,6 +188,29 @@ cd web && sudo docker compose pull web && sudo docker compose up -d --no-build
 
 (Perintah yang sama berlaku untuk jalur A dan B; jalur B membaca `COMPOSE_FILE` dari `.env`.)
 
+## Restart VPS (mis. setelah pembaruan kernel)
+
+Jadwalkan di jam sepi bersama pengelola sistem lain di VPS. Cukup restart — jangan sekaligus `apt upgrade`.
+
+```bash
+# 1. Pastikan semua menyala otomatis (harus "enabled"; website restart=unless-stopped)
+uname -r; systemctl is-enabled pm2-farmabit postgresql nginx docker
+pm2 list
+sudo docker inspect -f '{{.Name}} restart={{.HostConfig.RestartPolicy.Name}}' web-web-1
+# 2. Simpan daftar proses PM2 saat ini, lalu restart
+pm2 save
+sudo reboot
+```
+
+Login lagi setelah 2–3 menit, lalu periksa:
+
+```bash
+uname -r; systemctl is-active pm2-farmabit postgresql@14-main nginx docker
+pm2 list; sudo docker ps --format '{{.Names}}  {{.Status}}'
+echo "klinik:   $(curl -s -o /dev/null -w '%{http_code}' https://bintangusadabakti.com)"
+echo "farmabit: $(curl -s -o /dev/null -w '%{http_code}' -H 'Host: klinik.bintangusadabakti.com' http://127.0.0.1)"
+```
+
 ## Masalah umum
 
 | Gejala | Penyebab & solusi |
