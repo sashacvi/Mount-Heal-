@@ -1,0 +1,33 @@
+import path from 'path'
+import type { CollectionConfig } from 'payload'
+import { anyone, canEdit, isLoggedIn } from '../lib/access'
+
+const webp = { format: 'webp' as const, options: { quality: 82 } }
+
+export const Media: CollectionConfig = {
+  slug: 'media',
+  labels: { singular: 'Media', plural: 'Media' },
+  admin: { group: 'Konten', defaultColumns: ['filename', 'alt', 'updatedAt'] },
+  access: { read: anyone, create: isLoggedIn, update: isLoggedIn, delete: canEdit },
+  upload: {
+    staticDir: path.resolve(process.cwd(), 'media'),
+    mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/svg+xml'],
+    focalPoint: true,
+    adminThumbnail: 'thumb',
+    imageSizes: [
+      { name: 'thumb', width: 400, formatOptions: webp },
+      { name: 'card', width: 960, height: 540, formatOptions: webp },
+      { name: 'square', width: 720, height: 720, formatOptions: webp },
+      { name: 'large', width: 1800, formatOptions: webp },
+    ],
+  },
+  fields: [
+    {
+      name: 'alt',
+      label: 'Teks alternatif',
+      type: 'text',
+      required: true,
+      admin: { description: 'Jelaskan isi foto secara singkat, untuk pembaca layar dan mesin pencari.' },
+    },
+  ],
+}

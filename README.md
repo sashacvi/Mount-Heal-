@@ -1,11 +1,13 @@
-# Website Company Profile Klinik — Rancangan
+# Website Klinik Mustika Sekar Taji
 
-Rancangan dan prototipe interaktif website company profile klinik (nama kerja dummy: **Klinik Lumina Medika**).
+| Folder | Isi |
+|---|---|
+| `web/` | **Website siap pakai**: Next.js + Payload CMS (panel admin `/admin`). Lihat `web/README.md` untuk instalasi dan deploy. |
+| `docs/RANCANGAN-WEBSITE.md` | Riset, persona, palet & uji kontras, sitemap, spesifikasi fitur, catatan regulasi, sumber. |
+| `prototype/` | Prototipe HTML statis tahap rancangan (nama dummy "Lumina Medika"). Arsip; tidak dipakai oleh `web/`. |
 
-- `docs/RANCANGAN-WEBSITE.md` — riset, persona, palet & uji kontras, sitemap, spesifikasi fitur, rekomendasi teknis, kepatuhan, sumber.
-- `prototype/index.html` — prototipe halaman publik (light/dark, layanan, dokter & jadwal, kabar klinik, galeri, testimoni, mitra, peta, FAQ, daftar online).
-- `prototype/admin.html` — prototipe panel admin (posting berita/artikel/pengumuman, moderasi testimoni, galeri, mitra, jadwal dokter).
+Mulai cepat:
 
-Buka `prototype/index.html` langsung di browser. Konten yang diterbitkan di panel admin muncul di halaman publik pada browser yang sama (demo memakai `localStorage`).
-
-Semua nama, alamat, angka, dokter, mitra, dan testimoni adalah data contoh.
+```bash
+cd web && cp .env.example .env && npm install && npm run seed && npm run dev
+```

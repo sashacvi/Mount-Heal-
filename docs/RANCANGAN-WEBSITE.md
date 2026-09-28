@@ -1,7 +1,7 @@
 # Rancangan Website Company Profile Klinik
 
-**Nama kerja (dummy):** Klinik Lumina Medika
-**Status:** Rancangan v1 + prototipe interaktif. Semua nama, alamat, angka, dokter, mitra, dan testimoni adalah **data contoh** yang diganti setelah detail klinik diterima.
+**Klinik:** Klinik Mustika Sekar Taji (Kintamani, Bangli, Bali). Prototipe awal memakai nama dummy "Lumina Medika".
+**Status:** Rancangan v1 → **diimplementasikan di folder `web/`** (Next.js + Payload CMS) dengan data klinik asli (28 September 2026).
 **Tanggal:** 27 September 2026
 
 | Berkas | Isi |

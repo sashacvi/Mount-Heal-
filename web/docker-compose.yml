@@ -1,0 +1,20 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+        NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY:-}
+    env_file: .env
+    environment:
+      DATABASE_URL: file:./data/klinik.db
+    ports:
+      - '3000:3000'
+    volumes:
+      - klinik-data:/app/data
+      - klinik-media:/app/media
+    restart: unless-stopped
+
+volumes:
+  klinik-data:
+  klinik-media:
