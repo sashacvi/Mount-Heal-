@@ -46,6 +46,8 @@ export default buildConfig({
         Logo: '/components/admin/AdminLogo',
         Icon: '/components/admin/AdminIcon',
       },
+      afterLogin: ['/components/admin/BackToSite'],
+      afterNavLinks: ['/components/admin/ViewSiteLink'],
     },
   },
   i18n: { supportedLanguages: { id }, fallbackLanguage: 'id' },

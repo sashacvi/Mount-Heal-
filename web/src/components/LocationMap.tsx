@@ -19,7 +19,9 @@ export function LocationMap({ lat, lng, name, address, embedKey }: Props) {
 
     import('leaflet').then((L) => {
       if (cancelled || !el.current) return
-      map = L.map(el.current, { scrollWheelZoom: false }).setView([lat, lng], 15)
+      // Di layar sentuh, geser satu jari tetap untuk scroll halaman (bukan menggeser peta); perbesar dengan dua jari atau tombol +/−.
+      const touch = window.matchMedia('(pointer: coarse)').matches
+      map = L.map(el.current, { scrollWheelZoom: false, dragging: !touch }).setView([lat, lng], 15)
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',

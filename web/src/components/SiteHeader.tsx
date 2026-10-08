@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Icon } from './Icon'
 import { openRegister } from './RegisterButton'
 import { ThemeToggle } from './ThemeToggle'
@@ -119,7 +120,8 @@ export function SiteHeader({ services, hasGallery }: { services: string[]; hasGa
         </div>
       </div>
 
-      {drawer && (
+      {/* Drawer dirender di <body> agar tidak terkurung di dalam header (sticky) dan selalu di atas tombol WhatsApp. */}
+      {drawer && createPortal(
         <div className="drawer" onClick={(e) => e.target === e.currentTarget && setDrawer(false)}>
           <div className="drawer-panel" role="dialog" aria-modal="true" aria-label="Menu">
             <div className="drawer-head">
@@ -159,7 +161,8 @@ export function SiteHeader({ services, hasGallery }: { services: string[]; hasGa
               Daftar Berobat
             </button>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </header>
   )
