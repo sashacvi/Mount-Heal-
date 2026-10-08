@@ -47,6 +47,8 @@ export async function seedClinic(payload: Payload): Promise<void> {
       address: 'Jalan Raya Desa Lembean, Lembean, Kec. Kintamani\nKabupaten Bangli, Bali 80652',
       // Koordinat pusat Desa Lembean. Ganti dengan koordinat pin klinik dari Google Maps bila tersedia.
       mapsUrl: 'https://maps.app.goo.gl/LAKbhRadhn4KddM16',
+      otherNames: 'Klinik Bintang Usada Bhakti\nKlinik Bintang Usada Bakti',
+      serviceArea: 'Desa Lembean\nKecamatan Kintamani\nKabupaten Bangli',
       latitude: -8.290927,
       longitude: 115.278522,
       whatsapp: '087864114866',

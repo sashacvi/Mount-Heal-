@@ -11,8 +11,10 @@ import { StaffPortrait } from '@/components/StaffPortrait'
 import { TestimonialsCarousel } from '@/components/TestimonialsCarousel'
 import type { HoursRow } from '@/components/types'
 import { DAY_NAMES, WEEK_ORDER, fmtPhone, fmtRange, nowInClinic, waLink } from '@/lib/format'
+import { homeJsonLd, ldJson } from '@/lib/seo'
 import { getHomeData, imgUrl, media } from '@/lib/site'
 import { toPostLite, toStaffLite } from '@/lib/view'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 
 /** Teks di antara *bintang* diberi sorotan kuning. */
@@ -39,6 +41,9 @@ const abbr = (name: string) =>
     .map((w) => w[0])
     .join('')
     .toUpperCase()
+
+// Hanya canonical: objek openGraph di halaman akan menimpa seluruh openGraph dari layout.
+export const metadata: Metadata = { alternates: { canonical: '/' } }
 
 export default async function HomePage() {
   const { settings, services, staff, posts, gallery, testimonials, partners, faqs } = await getHomeData()
@@ -77,32 +82,11 @@ export default async function HomePage() {
     },
   ].filter(Boolean) as { v: string; l: string }[]
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'MedicalClinic',
-    name: settings.clinicName,
-    url: process.env.NEXT_PUBLIC_SITE_URL,
-    logo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/brand/logo-full.svg`,
-    telephone: settings.phone || settings.whatsapp,
-    address: { '@type': 'PostalAddress', streetAddress: address, addressRegion: 'Bali', addressCountry: 'ID' },
-    geo: { '@type': 'GeoCoordinates', latitude: settings.latitude, longitude: settings.longitude },
-    hasMap: settings.mapsUrl,
-    foundingDate: settings.foundedYear ? String(settings.foundedYear) : undefined,
-    medicalSpecialty: 'PrimaryCare',
-    openingHoursSpecification: hours
-      .filter((h) => !h.closed)
-      .map((h) => ({
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][Number(h.day)],
-        opens: h.open,
-        closes: h.close,
-      })),
-    availableService: services.map((s) => ({ '@type': 'MedicalProcedure', name: s.name })),
-  }
+  const jsonLd = homeJsonLd({ settings, services, staff, faqs, images: gallery.map((g) => media(g.image)), imgUrl: (m) => imgUrl(m ?? null, 'large') })
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }} />
 
       {/* ============ HERO ============ */}
       <section className="hero" id="beranda">

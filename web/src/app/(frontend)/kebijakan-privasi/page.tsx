@@ -6,6 +6,7 @@ import { getSettings } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Kebijakan Privasi',
   description: 'Cara Klinik Mustika Sekar Taji memperlakukan data pribadi pengunjung situs dan pasien.',
+  alternates: { canonical: '/kebijakan-privasi' },
 }
 
 export default async function PrivacyPage() {

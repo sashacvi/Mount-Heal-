@@ -6,6 +6,7 @@ import { Icon } from '@/components/Icon'
 import { PostCard, TYPE_LABEL } from '@/components/NewsSection'
 import { RegisterButton } from '@/components/RegisterButton'
 import { fmtDate, waLink } from '@/lib/format'
+import { ldJson, postJsonLd } from '@/lib/seo'
 import { getPostBySlug, getPosts, getSettings, imgUrl, media } from '@/lib/site'
 import { toPostLite } from '@/lib/view'
 
@@ -18,7 +19,8 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   return {
     title: post.title,
     description: post.excerpt,
-    openGraph: { type: 'article', title: post.title, description: post.excerpt, images: cover ? [cover] : ['/og.png'], publishedTime: post.publishedAt },
+    alternates: { canonical: `/kabar/${post.slug}` },
+    openGraph: { type: 'article', url: `/kabar/${post.slug}`, title: post.title, description: post.excerpt, images: cover ? [cover] : ['/og.png'], publishedTime: post.publishedAt, modifiedTime: post.updatedAt },
   }
 }
 
@@ -31,21 +33,11 @@ export default async function PostPage({ params }: Args) {
   const reviewer = post.medicalReviewer && typeof post.medicalReviewer === 'object' ? post.medicalReviewer.name : null
   const others = recent.filter((p) => p.id !== post.id).slice(0, 3)
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': post.type === 'artikel' ? 'MedicalWebPage' : 'NewsArticle',
-    headline: post.title,
-    description: post.excerpt,
-    datePublished: post.publishedAt,
-    dateModified: post.updatedAt,
-    author: author ? { '@type': 'Person', name: author } : { '@type': 'Organization', name: settings.clinicName },
-    reviewedBy: reviewer ? { '@type': 'Person', name: reviewer } : undefined,
-    publisher: { '@type': 'MedicalClinic', name: settings.clinicName },
-  }
+  const jsonLd = postJsonLd(post, settings.clinicName, imgUrl(cover, 'large'), author)
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }} />
       <section className="page-head">
         <div className="wrap">
           <nav className="crumbs" aria-label="Breadcrumb">

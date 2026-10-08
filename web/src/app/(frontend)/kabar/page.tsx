@@ -6,7 +6,8 @@ import { toPostLite } from '@/lib/view'
 
 export const metadata: Metadata = {
   title: 'Kabar Klinik',
-  description: 'Berita, artikel kesehatan, dan pengumuman terbaru dari Klinik Mustika Sekar Taji.',
+  description: 'Berita, artikel kesehatan, dan pengumuman terbaru dari Klinik Mustika Sekar Taji, Kintamani, Bangli.',
+  alternates: { canonical: '/kabar' },
 }
 
 const TYPES = ['berita', 'artikel', 'pengumuman'] as const

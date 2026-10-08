@@ -300,7 +300,7 @@ export interface Staff {
    */
   photo?: (number | null) | Media;
   /**
-   * 1 = foto utuh. Naikkan (mis. 2,5) untuk foto seluruh badan agar wajah terlihat jelas di kartu.
+   * 1 = foto utuh. Untuk foto seluruh badan pakai 3–3,5 agar wajah terlihat jelas di kartu.
    */
   photoZoom?: number | null;
   bio?: string | null;
@@ -986,6 +986,22 @@ export interface SiteSetting {
   googleRating?: number | null;
   googleReviewCount?: number | null;
   googleSyncedAt?: string | null;
+  /**
+   * Ideal 50–60 karakter. Sebutkan nama klinik dan lokasi.
+   */
+  seoTitle?: string | null;
+  /**
+   * Ideal 120–160 karakter: lokasi, layanan utama, jam buka, BPJS.
+   */
+  seoDescription?: string | null;
+  /**
+   * Satu nama per baris, mis. nama sebelum berganti. Membantu Google mengenali bahwa nama lama dan baru adalah klinik yang sama.
+   */
+  otherNames?: string | null;
+  /**
+   * Satu wilayah per baris, mis. Kecamatan Kintamani, Kabupaten Bangli, atau nama desa sekitar.
+   */
+  serviceArea?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1041,6 +1057,10 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   googleRating?: T;
   googleReviewCount?: T;
   googleSyncedAt?: T;
+  seoTitle?: T;
+  seoDescription?: T;
+  otherNames?: T;
+  serviceArea?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

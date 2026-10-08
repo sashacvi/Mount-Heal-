@@ -10,6 +10,7 @@ import { SiteHeader } from '@/components/SiteHeader'
 import { themeInitScript } from '@/components/ThemeToggle'
 import type { HoursRow } from '@/components/types'
 import { fmtPhone, waLink } from '@/lib/format'
+import { homeDescription, homeTitle, SITE_URL } from '@/lib/seo'
 import { activeAnnouncements, getHomeData } from '@/lib/site'
 import { toStaffLite } from '@/lib/view'
 import './globals.css'
@@ -19,16 +20,17 @@ export const dynamic = 'force-dynamic'
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700', '800'], variable: '--font-jakarta', display: 'swap' })
 const dmMono = DM_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-dm-mono', display: 'swap' })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-
 export async function generateMetadata(): Promise<Metadata> {
-  const { settings } = await getHomeData()
-  const description = `${settings.clinicName} di ${settings.address.split('\n')[0]}. ${settings.intro}`.slice(0, 300)
+  const { settings, services } = await getHomeData()
+  const title = homeTitle(settings)
+  const description = homeDescription(settings, services)
   return {
     metadataBase: new URL(SITE_URL),
-    title: { default: `${settings.clinicName} · Kintamani, Bangli`, template: `%s · ${settings.clinicName}` },
+    title: { default: title, template: `%s · ${settings.clinicName}` },
     description,
-    openGraph: { type: 'website', locale: 'id_ID', siteName: settings.clinicName, images: ['/og.png'] },
+    applicationName: settings.clinicName,
+    openGraph: { type: 'website', locale: 'id_ID', siteName: settings.clinicName, title, description, images: ['/og.png'] },
+    twitter: { card: 'summary_large_image', title, description, images: ['/og.png'] },
     icons: { icon: '/icon.svg', apple: '/apple-icon.png' },
   }
 }

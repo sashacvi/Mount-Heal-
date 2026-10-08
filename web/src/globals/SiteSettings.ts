@@ -145,6 +145,38 @@ export const SiteSettings: GlobalConfig = {
             },
           ],
         },
+        {
+          label: 'SEO & Google',
+          description: 'Cara klinik tampil di hasil pencarian Google. Kosongkan judul/deskripsi untuk memakai teks otomatis.',
+          fields: [
+            {
+              name: 'seoTitle',
+              label: 'Judul di Google (beranda)',
+              type: 'text',
+              maxLength: 70,
+              admin: { placeholder: 'Klinik Mustika Sekar Taji – Klinik di Kintamani, Bangli', description: 'Ideal 50–60 karakter. Sebutkan nama klinik dan lokasi.' },
+            },
+            {
+              name: 'seoDescription',
+              label: 'Deskripsi di Google (beranda)',
+              type: 'textarea',
+              maxLength: 170,
+              admin: { description: 'Ideal 120–160 karakter: lokasi, layanan utama, jam buka, BPJS.' },
+            },
+            {
+              name: 'otherNames',
+              label: 'Nama lain / nama lama klinik',
+              type: 'textarea',
+              admin: { description: 'Satu nama per baris, mis. nama sebelum berganti. Membantu Google mengenali bahwa nama lama dan baru adalah klinik yang sama.' },
+            },
+            {
+              name: 'serviceArea',
+              label: 'Wilayah yang dilayani',
+              type: 'textarea',
+              admin: { description: 'Satu wilayah per baris, mis. Kecamatan Kintamani, Kabupaten Bangli, atau nama desa sekitar.' },
+            },
+          ],
+        },
       ],
     },
   ],
